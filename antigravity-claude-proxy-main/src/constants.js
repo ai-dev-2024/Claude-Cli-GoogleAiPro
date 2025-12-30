@@ -1,10 +1,40 @@
 /**
  * Constants for Antigravity Cloud Code API integration
  * Based on: https://github.com/NoeFabris/opencode-antigravity-auth
+ *
+ * Configuration values can be overridden via environment variables.
+ * See .env.example for available options.
  */
 
+import { config } from 'dotenv';
 import { homedir, platform, arch } from 'os';
 import { join } from 'path';
+
+// Load environment variables from .env file
+config();
+
+/**
+ * Get environment variable with optional default value
+ * @param {string} name - Environment variable name
+ * @param {string|number|undefined} defaultValue - Default value if not set
+ * @returns {string|undefined} The environment variable value or default
+ */
+function getEnv(name, defaultValue = undefined) {
+    return process.env[name] ?? defaultValue;
+}
+
+/**
+ * Get environment variable as integer with default value
+ * @param {string} name - Environment variable name
+ * @param {number} defaultValue - Default value if not set or invalid
+ * @returns {number} The parsed integer value
+ */
+function getEnvInt(name, defaultValue) {
+    const value = process.env[name];
+    if (value === undefined) return defaultValue;
+    const parsed = parseInt(value, 10);
+    return isNaN(parsed) ? defaultValue : parsed;
+}
 
 /**
  * Get the Antigravity database path based on the current platform.
@@ -57,35 +87,53 @@ export const ANTIGRAVITY_HEADERS = {
 };
 
 // Default project ID if none can be discovered
-export const DEFAULT_PROJECT_ID = 'rising-fact-p41fc';
+export const DEFAULT_PROJECT_ID = getEnv('DEFAULT_PROJECT_ID', 'rising-fact-p41fc');
 
-export const TOKEN_REFRESH_INTERVAL_MS = 5 * 60 * 1000; // 5 minutes
-export const REQUEST_BODY_LIMIT = '50mb';
-export const ANTIGRAVITY_AUTH_PORT = 9092;
-export const DEFAULT_PORT = 8080;
+// Server configuration (can be overridden via environment variables)
+export const DEFAULT_PORT = getEnvInt('PORT', 8080);
+export const REQUEST_BODY_LIMIT = getEnv('REQUEST_BODY_LIMIT', '50mb');
+
+// Token and timing configuration
+export const TOKEN_REFRESH_INTERVAL_MS = getEnvInt('TOKEN_REFRESH_INTERVAL', 5 * 60 * 1000); // 5 minutes
+export const DEFAULT_COOLDOWN_MS = getEnvInt('RATE_LIMIT_COOLDOWN', 60 * 1000); // 1 minute default cooldown
+export const MAX_WAIT_BEFORE_ERROR_MS = getEnvInt('MAX_WAIT_BEFORE_ERROR', 120000); // 2 minutes
+
+// Auto-wait mode: When enabled, waits indefinitely for rate limits to reset instead of throwing errors
+// Set to 'true' or '1' to enable
+export const AUTO_WAIT_FOR_RATE_LIMIT = getEnv('AUTO_WAIT_FOR_RATE_LIMIT', 'true') === 'true' ||
+    getEnv('AUTO_WAIT_FOR_RATE_LIMIT', 'true') === '1';
+
+// Progress update interval during long waits (in milliseconds)
+export const RATE_LIMIT_PROGRESS_INTERVAL_MS = getEnvInt('RATE_LIMIT_PROGRESS_INTERVAL', 30000); // 30 seconds
+
+// Maximum time to wait for rate limit reset (0 = infinite)
+export const MAX_RATE_LIMIT_WAIT_MS = getEnvInt('MAX_RATE_LIMIT_WAIT', 0); // 0 = wait forever
+
+// Retry and account limits
+export const MAX_RETRIES = getEnvInt('MAX_RETRIES', 5); // Max retry attempts across accounts
+export const MAX_ACCOUNTS = getEnvInt('MAX_ACCOUNTS', 10); // Maximum number of accounts allowed
+
+// Request timeout (new)
+export const REQUEST_TIMEOUT_MS = getEnvInt('REQUEST_TIMEOUT', 60000); // 60 seconds default
+
+// Antigravity auth port
+export const ANTIGRAVITY_AUTH_PORT = getEnvInt('ANTIGRAVITY_AUTH_PORT', 9092);
 
 // Multi-account configuration
-export const ACCOUNT_CONFIG_PATH = join(
+export const ACCOUNT_CONFIG_PATH = getEnv('ACCOUNT_CONFIG_PATH', join(
     homedir(),
     '.config/antigravity-proxy/accounts.json'
-);
+));
 
 // Antigravity app database path (for legacy single-account token extraction)
 // Uses platform-specific path detection
 export const ANTIGRAVITY_DB_PATH = getAntigravityDbPath();
 
-export const DEFAULT_COOLDOWN_MS = 60 * 1000; // 1 minute default cooldown
-export const MAX_RETRIES = 5; // Max retry attempts across accounts
-export const MAX_ACCOUNTS = 10; // Maximum number of accounts allowed
-
-// Rate limit wait thresholds
-export const MAX_WAIT_BEFORE_ERROR_MS = 120000; // 2 minutes - throw error if wait exceeds this
-
 // Thinking model constants
 export const MIN_SIGNATURE_LENGTH = 50; // Minimum valid thinking signature length
 
 // Gemini-specific limits
-export const GEMINI_MAX_OUTPUT_TOKENS = 16384;
+export const GEMINI_MAX_OUTPUT_TOKENS = getEnvInt('GEMINI_MAX_OUTPUT_TOKENS', 16384);
 
 // Gemini signature handling
 // Sentinel value to skip thought signature validation when Claude Code strips the field
@@ -93,7 +141,10 @@ export const GEMINI_MAX_OUTPUT_TOKENS = 16384;
 export const GEMINI_SKIP_SIGNATURE = 'skip_thought_signature_validator';
 
 // Cache TTL for Gemini thoughtSignatures (2 hours)
-export const GEMINI_SIGNATURE_CACHE_TTL_MS = 2 * 60 * 60 * 1000;
+export const GEMINI_SIGNATURE_CACHE_TTL_MS = getEnvInt('GEMINI_SIGNATURE_CACHE_TTL', 2 * 60 * 60 * 1000);
+
+// Logging configuration
+export const LOG_LEVEL = getEnv('LOG_LEVEL', 'info');
 
 /**
  * Get the model family from model name (dynamic detection, no hardcoded list).
@@ -126,14 +177,20 @@ export function isThinkingModel(modelName) {
     return false;
 }
 
-// Google OAuth configuration (from opencode-antigravity-auth)
+// Default OAuth credentials (can be overridden via environment variables)
+// Note: These are public OAuth credentials for the Antigravity integration.
+// For custom OAuth apps, set GOOGLE_OAUTH_CLIENT_ID and GOOGLE_OAUTH_CLIENT_SECRET
+const DEFAULT_OAUTH_CLIENT_ID = '1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com';
+const DEFAULT_OAUTH_CLIENT_SECRET = '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';
+
+// Google OAuth configuration
 export const OAUTH_CONFIG = {
-    clientId: '1071006060591-tmhssin2h21lcre235vtolojh4g403ep.apps.googleusercontent.com',
-    clientSecret: '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',
+    clientId: getEnv('GOOGLE_OAUTH_CLIENT_ID', DEFAULT_OAUTH_CLIENT_ID),
+    clientSecret: getEnv('GOOGLE_OAUTH_CLIENT_SECRET', DEFAULT_OAUTH_CLIENT_SECRET),
     authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
     tokenUrl: 'https://oauth2.googleapis.com/token',
     userInfoUrl: 'https://www.googleapis.com/oauth2/v1/userinfo',
-    callbackPort: 51121,
+    callbackPort: getEnvInt('OAUTH_CALLBACK_PORT', 51121),
     scopes: [
         'https://www.googleapis.com/auth/cloud-platform',
         'https://www.googleapis.com/auth/userinfo.email',
@@ -158,10 +215,15 @@ export default {
     MAX_RETRIES,
     MAX_ACCOUNTS,
     MAX_WAIT_BEFORE_ERROR_MS,
+    AUTO_WAIT_FOR_RATE_LIMIT,
+    RATE_LIMIT_PROGRESS_INTERVAL_MS,
+    MAX_RATE_LIMIT_WAIT_MS,
+    REQUEST_TIMEOUT_MS,
     MIN_SIGNATURE_LENGTH,
     GEMINI_MAX_OUTPUT_TOKENS,
     GEMINI_SKIP_SIGNATURE,
     GEMINI_SIGNATURE_CACHE_TTL_MS,
+    LOG_LEVEL,
     getModelFamily,
     isThinkingModel,
     OAUTH_CONFIG,

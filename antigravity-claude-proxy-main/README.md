@@ -211,6 +211,27 @@ claude
 
 ---
 
+## 🕹️ Power User Tips
+
+### YOLO Mode (Maximum Autonomy)
+Run Claude without permission prompts for tools or bash commands:
+```bash
+claude --dangerously-skip-permissions
+```
+
+### Auto-Accept Edits
+Toggle zero-click edits during your session using the keyboard:
+- **Shortcut**: `Shift + Tab`
+- **Effect**: Cycles through `Default` → `Auto-Accept` → `Plan Mode`
+- **Indicator**: Active mode is shown in the bottom-left status bar.
+
+### Manage Sessions
+- `/resume`: List and switch sessions inside Claude
+- `claude --resume`: List sessions from your terminal
+- `/rename "title"`: Name your current session
+
+---
+
 ## Available Models
 
 ### Claude Models
