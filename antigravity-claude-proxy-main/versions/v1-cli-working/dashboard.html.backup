@@ -1202,26 +1202,6 @@ Only the extension dropdown needs a reload to update.
             }
         }
 
-        // Show help about extension UI limitation
-        function showReloadHelp() {
-            alert(`⚠️ VS Code Extension UI Limitation (v3)
-
-When you change the model here, the extension's "Custom model" dropdown label doesn't update in real-time. This is a VS Code caching limitation.
-
-✅ The actual model DOES change immediately
-❌ The dropdown label stays stale until reload
-
-How it works:
-• Default/Opus/Haiku → Uses that model directly (pass-through)
-• Custom model → Uses whatever dashboard has selected
-
-To update the UI label:
-• Press Ctrl+Shift+P → "Reload Window"
-• Or restart Antigravity
-
-Note: Even with stale label, clicking "Custom model" WILL use the dashboard-selected model!`);
-        }
-
         // Load active model on page load
         loadActiveModel();
 

@@ -140,13 +140,8 @@ function persistModelOverride(model) {
     }
 }
 
-// Load on module init and sync to settings.json
-const loadedModel = loadPersistedModelOverride();
-if (loadedModel) {
-    // Sync to settings.json on startup so extension shows correct model
-    syncModelToSettings(loadedModel);
-    console.log(`[ModelSwitch] Startup sync: ${loadedModel} → settings.json`);
-}
+// Load on module init
+loadPersistedModelOverride();
 
 function getActiveModel() {
     return globalModelOverride || 'gemini-3-flash';
@@ -927,44 +922,37 @@ app.post('/v1/messages', async (req, res) => {
         }
 
         // Build the request object (resolve model alias if used)
-        // PASS-THROUGH MODE: Extension dropdown controls actual model
-        // Dashboard only sets what the "Custom model" option uses
+        // If global model override is set (via dashboard), use that instead
 
         // DEBUG: Log raw model name from extension
         console.log(`[DEBUG] Raw model from extension: "${model}"`);
 
         let resolvedModel = resolveModelAlias(model) || 'gemini-3-flash';
+        const requestedByClient = resolvedModel; // What the extension/client requested (after alias resolution)
         const originalModelName = model; // Original model name from extension
 
-        // ================= SMART ROUTING =================
-        // Logic:
-        // 1. Read what Custom model value is in settings.json
-        // 2. If extension sends that value → Use dashboard override (Custom model follows dashboard)
-        // 3. If extension sends Default/Opus/Haiku → Pass through directly
+        // ================= BIDIRECTIONAL SYNC =================
+        // Dashboard model takes priority. Extension can only override by explicitly
+        // selecting a DIFFERENT model (user action, not just cached value)
 
-        // Get what Custom model value is currently set in settings.json
-        let settingsCustomModel = null;
-        try {
-            if (fs.existsSync(ANTIGRAVITY_SETTINGS)) {
-                const content = fs.readFileSync(ANTIGRAVITY_SETTINGS, 'utf-8');
-                const match = content.match(/"claudeCode\.selectedModel"\s*:\s*"([^"]*)"/);
-                if (match) settingsCustomModel = match[1];
-            }
-        } catch (e) { }
+        // Check if extension is sending a NEW model (user changed dropdown)
+        const extensionModelChanged = lastExtensionModel !== null && requestedByClient !== lastExtensionModel;
 
-        // Check if extension is sending the Custom model value (from settings.json)
-        const isUsingCustomModel = settingsCustomModel && resolvedModel === settingsCustomModel;
-
-        if (isUsingCustomModel && globalModelOverride && globalModelOverride !== resolvedModel) {
-            // Extension clicked "Custom model" but dashboard has a different value
-            // Use the dashboard value instead
-            console.log(`[API] Custom model selected: ${resolvedModel} → Using dashboard: ${globalModelOverride}`);
+        if (extensionModelChanged) {
+            // User explicitly changed extension dropdown - switch to their selection
+            console.log(`[Sync] Extension changed from ${lastExtensionModel} to ${requestedByClient}`);
+            globalModelOverride = requestedByClient;
+            resolvedModel = requestedByClient;
+            persistModelOverride(requestedByClient);
+            syncModelToSettings(requestedByClient);
+        } else if (globalModelOverride) {
+            // Dashboard model takes priority
+            console.log(`[API] Using dashboard model: ${globalModelOverride}`);
             resolvedModel = globalModelOverride;
-        } else if (isUsingCustomModel) {
-            console.log(`[API] Extension using Custom model: ${resolvedModel} (matches dashboard)`);
-        } else {
-            console.log(`[API] Extension using UI model: ${resolvedModel} (Opus/Haiku/Default - pass-through)`);
         }
+
+        // Track what extension last sent
+        lastExtensionModel = requestedByClient;
 
         // ================= MODEL INFO INJECTION =================
         // Add active model info to system prompt so AI knows what it's using
@@ -989,9 +977,8 @@ app.post('/v1/messages', async (req, res) => {
         const requestStartTime = Date.now();
         console.log(`[API] Request for model: ${request.model}, stream: ${!!stream}, messages: ${messages.length}`);
 
-        // Log full routing flow to file for verification
-        const routingInfo = `RECEIVED: ${originalModelName} → OVERRIDE: ${globalModelOverride || 'none'} → SENT: ${request.model}`;
-        logRequest('ROUTE', routingInfo, globalModelOverride ? 'dashboard-override' : 'extension', null);
+        // Log to file for verification
+        logRequest('REQUEST', request.model, globalModelOverride ? 'dashboard-override' : 'extension', null);
 
         // Debug: Log message structure to diagnose tool_use/tool_result ordering
         if (process.env.DEBUG) {

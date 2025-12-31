@@ -1,0 +1,126 @@
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "http://localhost:8080",
+    "ANTHROPIC_API_KEY": "antigravity-proxy",
+    "ANTHROPIC_MODEL": "gemini-3-pro-high",
+    "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-5-thinking",
+    "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4-5-thinking",
+    "ANTHROPIC_DEFAULT_HAIKU_MODEL": "gemini-3-flash",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "gemini-3-flash",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+  },
+  "permissions": {
+    "allow": [
+      "Bash(ls:*)",
+      "Bash(dir:*)",
+      "Bash(cat:*)",
+      "Bash(type:*)",
+      "Bash(pwd:*)",
+      "Bash(cd:*)",
+      "Bash(echo:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(Get-ChildItem:*)",
+      "Bash(Get-Content:*)",
+      "Bash(Get-Location:*)",
+      "Bash(Select-String:*)",
+      "Bash(Compress-Archive:*)",
+      "Bash(git status:*)",
+      "Bash(git log:*)",
+      "Bash(git diff:*)",
+      "Bash(npm run:*)",
+      "Bash(node:*)"
+    ],
+    "ask": [
+      "Bash(rm:*)",
+      "Bash(rm -rf:*)",
+      "Bash(del:*)",
+      "Bash(Remove-Item:*)",
+      "Bash(rmdir:*)",
+      "Bash(rd:*)",
+      "Bash(format:*)",
+      "Bash(diskpart:*)",
+      "Bash(shutdown:*)",
+      "Bash(git push:*)",
+      "Bash(git reset:*)",
+      "Bash(git clean:*)",
+      "Bash(npm publish:*)",
+      "Bash(taskkill:*)"
+    ]
+  },
+  "model": "gemini-3-pro-high",
+  "customModels": [
+    {
+      "id": "gemini-2.5-flash",
+      "name": "Gemini 2.5 Flash",
+      "description": "💨 Current active model - Fast and capable"
+    },
+    {
+      "id": "gemini-3-pro-high",
+      "name": "Gemini 3 Pro High",
+      "description": "🔥 Most capable for complex work - $5/$25 per Mtok"
+    },
+    {
+      "id": "gemini-3-flash",
+      "name": "Gemini 3 Flash",
+      "description": "⚡ Fast agentic model - $3/$15 per Mtok"
+    },
+    {
+      "id": "gemini-2.5-flash-thinking",
+      "name": "Gemini 2.5 Flash Thinking",
+      "description": "🧠 Reasoning/thinking model with extended thoughts"
+    },
+    {
+      "id": "gemini-1.5-pro-002",
+      "name": "Gemini 1.5 Pro",
+      "description": "📊 Stable pro model for reliable tasks"
+    },
+    {
+      "id": "pplx-grok",
+      "name": "Grok (via Perplexity)",
+      "description": "🐦 xAI Grok model - Chat only, no tools"
+    },
+    {
+      "id": "pplx-claude-opus",
+      "name": "Claude Opus (via Perplexity)",
+      "description": "🎭 Claude Opus 4 - Chat only, no tools"
+    },
+    {
+      "id": "pplx-claude-sonnet",
+      "name": "Claude Sonnet (via Perplexity)",
+      "description": "🎵 Claude Sonnet 4 - Chat only, no tools"
+    },
+    {
+      "id": "pplx-gpt51",
+      "name": "GPT-5.1 (via Perplexity)",
+      "description": "🤖 OpenAI GPT-5.1 - Chat only, no tools"
+    },
+    {
+      "id": "pplx-kimi",
+      "name": "Kimi (via Perplexity)",
+      "description": "🌙 Moonshot Kimi - Chat only, no tools"
+    },
+    {
+      "id": "sonar",
+      "name": "Sonar (Perplexity Search)",
+      "description": "🔍 Web search model - Chat only"
+    },
+    {
+      "id": "sonar-pro",
+      "name": "Sonar Pro (Perplexity Search)",
+      "description": "🔍 Advanced web search - Chat only"
+    },
+    {
+      "id": "perplexity-auto",
+      "name": "Perplexity Auto",
+      "description": "🌐 Auto-select best Perplexity model"
+    }
+  ],
+  "enabledPlugins": {
+    "context7@claude-plugins-official": true,
+    "ralph-wiggum@claude-plugins-official": true
+  },
+  "thinking": false
+}

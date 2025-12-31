@@ -1,0 +1,73 @@
+{
+  "name": "antigravity-claude-proxy",
+  "version": "1.0.2",
+  "description": "Proxy server to use Antigravity's Claude models with Claude Code CLI",
+  "main": "src/index.js",
+  "type": "module",
+  "bin": {
+    "antigravity-claude-proxy": "bin/cli.js"
+  },
+  "files": [
+    "src",
+    "bin"
+  ],
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "accounts": "node src/accounts-cli.js",
+    "accounts:add": "node src/accounts-cli.js add",
+    "accounts:list": "node src/accounts-cli.js list",
+    "accounts:remove": "node src/accounts-cli.js remove",
+    "accounts:verify": "node src/accounts-cli.js verify",
+    "login:perplexity": "node scripts/login-perplexity.js",
+    "login:perplexity:session": "node scripts/login-perplexity-session.js",
+    "doctor": "node scripts/doctor.js",
+    "lint": "eslint src/",
+    "lint:fix": "eslint src/ --fix",
+    "format": "prettier --write src/",
+    "format:check": "prettier --check src/",
+    "test": "node tests/run-all.cjs",
+    "test:unit": "node --test tests/unit/",
+    "test:signatures": "node tests/test-thinking-signatures.cjs",
+    "test:multiturn": "node tests/test-multiturn-thinking-tools.cjs",
+    "test:streaming": "node tests/test-multiturn-thinking-tools-streaming.cjs",
+    "test:interleaved": "node tests/test-interleaved-thinking.cjs",
+    "test:images": "node tests/test-images.cjs",
+    "test:caching": "node tests/test-caching-streaming.cjs"
+  },
+  "keywords": [
+    "claude",
+    "anthropic",
+    "antigravity",
+    "proxy",
+    "vertex-ai"
+  ],
+  "author": "Badri Narayanan",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/badri-s2001/antigravity-claude-proxy.git"
+  },
+  "homepage": "https://github.com/badri-s2001/antigravity-claude-proxy#readme",
+  "bugs": {
+    "url": "https://github.com/badri-s2001/antigravity-claude-proxy/issues"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.6.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.18.2",
+    "pino": "^9.5.0",
+    "pino-pretty": "^13.0.0",
+    "puppeteer": "^24.34.0",
+    "puppeteer-extra": "^3.3.6",
+    "puppeteer-extra-plugin-stealth": "^2.11.2"
+  },
+  "devDependencies": {
+    "eslint": "^9.17.0",
+    "prettier": "^3.4.2"
+  }
+}
