@@ -1,15 +1,16 @@
 <p align="center">
+  <img src="https://img.shields.io/badge/Version-4.0-blue?style=for-the-badge" alt="Version 4.0">
   <img src="https://img.shields.io/badge/Claude_Code-Compatible-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Compatible">
   <img src="https://img.shields.io/badge/Antigravity-Powered-00D4AA?style=for-the-badge" alt="Antigravity Powered">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
 </p>
 
-<h1 align="center">🚀 Antigravity Claude Proxy</h1>
+<h1 align="center">🚀 Antigravity Claude Proxy v4.0</h1>
 
 <p align="center">
   <strong>Use Claude Code CLI with Gemini, GPT-5, Grok, Claude, and 20+ AI models</strong>
   <br>
-  <em>Multi-provider AI gateway with load balancing, auto-start, and beautiful dashboard</em>
+  <em>Multi-provider AI gateway with load balancing, status bar integration, and beautiful dashboard</em>
 </p>
 
 <p align="center">
@@ -17,7 +18,24 @@
   <a href="#-quick-start">Quick Start</a> •
   <a href="#-available-models">Models</a> •
   <a href="#-dashboard">Dashboard</a> •
+  <a href="#-status-bar">Status Bar</a> •
   <a href="#-support">Support</a>
+</p>
+
+---
+
+## 🖼️ Showcase
+
+<p align="center">
+  <img src="docs/images/dashboard.png" alt="Dashboard" width="600">
+  <br>
+  <em>Beautiful dashboard with multi-account load balancing</em>
+</p>
+
+<p align="center">
+  <img src="docs/images/statusbar.png" alt="Status Bar" width="400">
+  <br>
+  <em>Real-time model status in VS Code status bar</em>
 </p>
 
 ---
@@ -244,6 +262,26 @@ Use the proxy with Claude Code extension in Antigravity/VS Code:
 ### Quick Switch via Dashboard
 
 Open http://localhost:8080/dashboard and use the model dropdown in the header.
+
+---
+
+## 📊 Status Bar (v4.0)
+
+The enhanced `claude-proxy-status` extension shows the current model in your status bar:
+
+| Icon | Model |
+|------|-------|
+| ⚡ Flash | gemini-3-flash |
+| 💎 Pro | gemini-3-pro-high |
+| 🎭 Opus | claude-opus-* |
+| 🎵 Sonnet | claude-sonnet-* |
+| 🌐 Grok | pplx-grok |
+| 🔍 Perplexity | pplx-*, sonar |
+
+### Features:
+- **Real-time updates** - Polls every 3 seconds
+- **Click to open** - Opens dashboard on click
+- **Model change notification** - Toast when model changes
 
 ---
 
