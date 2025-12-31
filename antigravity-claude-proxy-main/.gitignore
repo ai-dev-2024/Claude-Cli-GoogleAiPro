@@ -33,8 +33,10 @@ build/
 # Sensitive data
 accounts.json
 perplexity-sessions.json
+model-override.json
 cookies/
 tokens/
+logs/
 *.token
 *.secret
 
