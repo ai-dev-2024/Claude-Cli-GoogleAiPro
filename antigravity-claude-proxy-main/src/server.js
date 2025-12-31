@@ -16,7 +16,7 @@ import { PerplexitySessionAccountManager } from './perplexity-session-account-ma
 import { getLoginService } from './perplexity-browser-login.js';
 import { getPerplexityBrowserClient } from './perplexity-browser-client.js';
 import { forceRefresh } from './token-extractor.js';
-import { REQUEST_BODY_LIMIT } from './constants.js';
+import { REQUEST_BODY_LIMIT, resolveModelAlias } from './constants.js';
 import { AccountManager } from './account-manager.js';
 import { formatDuration } from './utils/helpers.js';
 
@@ -635,9 +635,11 @@ app.post('/v1/messages', async (req, res) => {
             });
         }
 
-        // Build the request object
+        // Build the request object (resolve model alias if used)
+        const resolvedModel = resolveModelAlias(model) || 'gemini-3-flash';
+
         const request = {
-            model: model || 'claude-3-5-sonnet-20241022',
+            model: resolvedModel,
             messages,
             max_tokens: max_tokens || 4096,
             stream,
@@ -650,7 +652,8 @@ app.post('/v1/messages', async (req, res) => {
             temperature
         };
 
-        console.log(`[API] Request for model: ${request.model}, stream: ${!!stream}`);
+        const requestStartTime = Date.now();
+        console.log(`[API] Request for model: ${request.model}, stream: ${!!stream}, messages: ${messages.length}`);
 
         // Debug: Log message structure to diagnose tool_use/tool_result ordering
         if (process.env.DEBUG) {
@@ -665,9 +668,19 @@ app.post('/v1/messages', async (req, res) => {
 
         // Route to Perplexity if model is sonar, perplexity, or pplx- prefixed
         const modelLower = request.model.toLowerCase();
-        const isPerplexityModel = modelLower.includes('sonar') ||
+        let isPerplexityModel = modelLower.includes('sonar') ||
             modelLower.includes('perplexity') ||
             modelLower.startsWith('pplx-');
+
+        // AUTO-FALLBACK: If Perplexity model is used WITH tools, switch to Gemini
+        // Perplexity API doesn't support tool use - it will hallucinate actions
+        const hasTools = tools && Array.isArray(tools) && tools.length > 0;
+        if (isPerplexityModel && hasTools) {
+            const originalModel = request.model;
+            request.model = 'gemini-3-flash'; // Fallback to fast agentic model
+            isPerplexityModel = false;
+            console.log(`[API] ⚠️ AUTO-FALLBACK: ${originalModel} → gemini-3-flash (Perplexity can't use tools)`);
+        }
 
         if (isPerplexityModel) {
             console.log('[API] Routing to Perplexity via Python Server (curl_cffi)');
@@ -824,6 +837,8 @@ app.post('/v1/messages', async (req, res) => {
                 }
                 // Track usage for streaming
                 trackModelUsage('google', request.model);
+                const elapsed = Date.now() - requestStartTime;
+                console.log(`[API] Stream completed for ${request.model} in ${elapsed}ms`);
                 res.end();
 
             } catch (streamError) {
@@ -843,6 +858,8 @@ app.post('/v1/messages', async (req, res) => {
             const response = await sendMessage(request, accountManager);
             // Track usage for non-streaming
             trackModelUsage('google', request.model);
+            const elapsed = Date.now() - requestStartTime;
+            console.log(`[API] Non-streaming response for ${request.model} in ${elapsed}ms`);
             res.json(response);
         }
 

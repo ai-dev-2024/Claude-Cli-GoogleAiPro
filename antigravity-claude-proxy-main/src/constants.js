@@ -165,20 +165,77 @@ export function getModelFamily(modelName) {
 }
 
 /**
+ * Model aliases for easy natural language switching
+ * Users can type "/model flash" instead of "/model gemini-3-flash"
+ */
+export const MODEL_ALIASES = {
+    // Fast models (for quick tasks) - AGENTIC
+    'flash': 'gemini-3-flash',
+    'fast': 'gemini-3-flash',
+    'quick': 'gemini-3-flash',
+
+    // Pro models (stronger) - AGENTIC
+    'pro': 'gemini-3-pro-high',
+    'strong': 'gemini-3-pro-high',
+    'powerful': 'gemini-3-pro-high',
+
+    // Thinking models - AGENTIC
+    'think': 'gemini-2.5-flash-thinking',
+    'thinking': 'gemini-2.5-flash-thinking',
+
+    // Perplexity models - CHAT ONLY (no tool use!)
+    'grok': 'pplx-grok',
+    'kimi': 'pplx-kimi',
+    'claude': 'pplx-claude-opus',
+    'opus': 'pplx-claude-opus',
+    'sonnet': 'pplx-claude-sonnet',
+    'gpt': 'pplx-gpt51',
+    'gpt5': 'pplx-gpt51',
+    'pplx': 'perplexity-auto',
+    'perplexity': 'perplexity-auto',
+    'search': 'sonar',
+
+    // Sonar models (Perplexity's web search models) - CHAT ONLY
+    'sonar': 'sonar',
+    'sonar-pro': 'sonar-pro',
+    'sonar-reasoning': 'sonar-reasoning',
+    'sonar-deep': 'sonar-deep-research',
+    'research': 'sonar-deep-research',
+
+    // Google AI Claude models - AGENTIC
+    'claude-opus': 'claude-opus-4-5-thinking',
+    'claude-sonnet': 'claude-sonnet-4-5-thinking',
+};
+
+/**
+ * Resolve model name from alias or return original
+ * @param {string} modelName - Model name or alias
+ * @returns {string} Resolved model name
+ */
+export function resolveModelAlias(modelName) {
+    const lower = (modelName || '').toLowerCase().trim();
+    return MODEL_ALIASES[lower] || modelName;
+}
+
+/**
  * Check if a model supports thinking/reasoning output.
  * @param {string} modelName - The model name from the request
  * @returns {boolean} True if the model supports thinking blocks
  */
 export function isThinkingModel(modelName) {
     const lower = (modelName || '').toLowerCase();
+
+    // Flash and lite models should NEVER use extended thinking (fast models)
+    if (lower.includes('flash') || lower.includes('lite')) return false;
+
     // Claude thinking models have "thinking" in the name
     if (lower.includes('claude') && lower.includes('thinking')) return true;
-    // Gemini thinking models: explicit "thinking" in name, OR gemini version 3+
+
+    // Gemini thinking models: only if explicitly "thinking" in name or pro/high models
     if (lower.includes('gemini')) {
         if (lower.includes('thinking')) return true;
-        // Check for gemini-3 or higher (e.g., gemini-3, gemini-3.5, gemini-4, etc.)
-        const versionMatch = lower.match(/gemini-(\d+)/);
-        if (versionMatch && parseInt(versionMatch[1], 10) >= 3) return true;
+        // Only pro-high uses thinking, not flash
+        if (lower.includes('pro-high')) return true;
     }
     return false;
 }

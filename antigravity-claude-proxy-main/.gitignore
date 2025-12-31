@@ -21,10 +21,25 @@ tests/utils/*.png
 tests/utils/*.jpg
 tests/utils/*.jpeg
 
-# Environment
+# Environment and secrets
 .env
-.env.local
+.env.*
+*.local
 
 # Build output
 dist/
 build/
+
+# Sensitive data
+accounts.json
+perplexity-sessions.json
+cookies/
+tokens/
+*.token
+*.secret
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
