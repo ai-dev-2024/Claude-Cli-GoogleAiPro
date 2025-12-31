@@ -3,10 +3,10 @@
   <img src="https://img.shields.io/badge/Claude_Code-Compatible-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Compatible">
   <img src="https://img.shields.io/badge/Antigravity-Powered-00D4AA?style=for-the-badge" alt="Antigravity Powered">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
-  <img src="https://img.shields.io/badge/Node.js-18+-green?style=for-the-badge&logo=node.js" alt="Node.js 18+">
+  <a href="https://ko-fi.com/ai_dev_2024"><img src="https://img.shields.io/badge/Support%20Me-Ko--fi-red?style=for-the-badge&logo=ko-fi" alt="Support Me"></a>
 </p>
 
-<h1 align="center">🚀 Antigravity Claude Proxy</h1>
+<h1 align="center">🚀 Antigravity Claude Code Proxy</h1>
 
 <p align="center">
   <strong>Use Claude Code CLI with Gemini, GPT-5, Grok, and 20+ AI models</strong>

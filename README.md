@@ -6,7 +6,7 @@
   <a href="https://ko-fi.com/ai_dev_2024"><img src="https://img.shields.io/badge/Support%20Me-Ko--fi-red?style=for-the-badge&logo=ko-fi" alt="Support Me"></a>
 </p>
 
-<h1 align="center">🚀 Antigravity Claude Proxy</h1>
+<h1 align="center">🚀 Antigravity Claude Code Proxy</h1>
 
 <p align="center">
   <strong>Use Claude Code CLI with Gemini, GPT-5, Grok, and 20+ AI models</strong>
