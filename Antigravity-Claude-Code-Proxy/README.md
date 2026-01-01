@@ -1,4 +1,8 @@
 <p align="center">
+  <img src="docs/images/banner.png" alt="Antigravity Claude Code Proxy Banner" width="100%">
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/Version-4.1.0-blue?style=for-the-badge" alt="Version 4.1.0">
   <img src="https://img.shields.io/badge/Claude_Code-Compatible-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Compatible">
   <img src="https://img.shields.io/badge/Antigravity-Powered-00D4AA?style=for-the-badge" alt="Antigravity Powered">
@@ -269,6 +273,12 @@ MIT License - See [LICENSE](LICENSE) for details.
 </p>
 
 <br>
+
+<h2 align="center">❤️ Support This Project</h2>
+
+<p align="center">
+  If you find this project helpful, please consider buying me a coffee! Your support helps keep the updates coming.
+</p>
 
 <p align="center">
   <a href="https://ko-fi.com/ai_dev_2024">
