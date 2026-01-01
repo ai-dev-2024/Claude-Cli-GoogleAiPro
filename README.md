@@ -193,7 +193,7 @@ The status bar extension shows your current model in real-time:
 | 🔍 | Perplexity/Sonar |
 
 **Features:**
-- Updates every 3 seconds
+- Updates every 2 seconds
 - Click to open dashboard
 - Notification on model change
 

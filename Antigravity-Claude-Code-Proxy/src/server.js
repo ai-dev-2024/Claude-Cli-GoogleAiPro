@@ -930,8 +930,8 @@ app.post('/v1/messages', async (req, res) => {
         }
 
         // Build the request object (resolve model alias if used)
-        // PASS-THROUGH MODE: Extension dropdown controls actual model
-        // Dashboard only sets what the "Custom model" option uses
+        // ROBUST ROUTING: Claude Code UX has HIGHEST priority
+        // Dashboard/Status bar only affects "Custom model" selection
 
         // DEBUG: Log raw model name from extension
         console.log(`[DEBUG] Raw model from extension: "${model}"`);
@@ -939,35 +939,62 @@ app.post('/v1/messages', async (req, res) => {
         let resolvedModel = resolveModelAlias(model) || 'gemini-3-flash';
         const originalModelName = model; // Original model name from extension
 
-        // ================= SMART ROUTING =================
-        // Logic:
-        // 1. Read what Custom model value is in settings.json
-        // 2. If extension sends that value → Use dashboard override (Custom model follows dashboard)
-        // 3. If extension sends Default/Opus/Haiku → Pass through directly
+        // ================= ROBUST MODEL ROUTING =================
+        // Priority: Claude Code Dropdown > Dashboard/Status Bar Override
+        //
+        // Claude Code UX Mappings:
+        // - Default (claude-sonnet-4-5-thinking) → claude-sonnet-4-5-thinking
+        // - Opus → claude-opus-4-5-thinking  
+        // - Haiku → gemini-3-flash (Haiku not available on Google, use Flash)
+        // - Custom model → Whatever dashboard/status bar sets
 
-        // Get what Custom model value is currently set in settings.json
-        let settingsCustomModel = null;
-        try {
-            if (fs.existsSync(ANTIGRAVITY_SETTINGS)) {
-                const content = fs.readFileSync(ANTIGRAVITY_SETTINGS, 'utf-8');
-                const match = content.match(/"claudeCode\.selectedModel"\s*:\s*"([^"]*)"/);
-                if (match) settingsCustomModel = match[1];
+        // Detect explicit UI selections by checking model name patterns
+        const inputModelLower = (model || '').toLowerCase();
+
+        // Check for Haiku selection (maps to Flash)
+        const isHaikuSelection = inputModelLower.includes('haiku');
+
+        // Check for Opus selection
+        const isOpusSelection = inputModelLower.includes('opus') && !inputModelLower.includes('pplx');
+
+        // Check for Sonnet/Default selection  
+        const isSonnetSelection = inputModelLower.includes('sonnet') && !inputModelLower.includes('pplx');
+
+        // Check if this is an explicit dropdown selection (not Custom model)
+        const isExplicitUISelection = isHaikuSelection || isOpusSelection || isSonnetSelection;
+
+        let actualModelUsed = resolvedModel;
+
+        if (isExplicitUISelection) {
+            // User explicitly selected from Claude Code dropdown - HIGHEST PRIORITY
+            // Apply correct mapping
+            if (isHaikuSelection) {
+                actualModelUsed = 'gemini-3-flash';
+                console.log(`[ROUTING] Haiku selected → Using gemini-3-flash`);
+            } else if (isOpusSelection) {
+                actualModelUsed = 'claude-opus-4-5-thinking';
+                console.log(`[ROUTING] Opus selected → Using claude-opus-4-5-thinking`);
+            } else if (isSonnetSelection) {
+                actualModelUsed = 'claude-sonnet-4-5-thinking';
+                console.log(`[ROUTING] Sonnet/Default selected → Using claude-sonnet-4-5-thinking`);
             }
-        } catch (e) { }
 
-        // Check if extension is sending the Custom model value (from settings.json)
-        const isUsingCustomModel = settingsCustomModel && resolvedModel === settingsCustomModel;
-
-        if (isUsingCustomModel && globalModelOverride && globalModelOverride !== resolvedModel) {
-            // Extension clicked "Custom model" but dashboard has a different value
-            // Use the dashboard value instead
-            console.log(`[API] Custom model selected: ${resolvedModel} → Using dashboard: ${globalModelOverride}`);
-            resolvedModel = globalModelOverride;
-        } else if (isUsingCustomModel) {
-            console.log(`[API] Extension using Custom model: ${resolvedModel} (matches dashboard)`);
+            // Update global override so status bar shows the correct model
+            if (globalModelOverride !== actualModelUsed) {
+                globalModelOverride = actualModelUsed;
+                persistModelOverride(actualModelUsed);
+                console.log(`[ROUTING] Status bar sync: ${actualModelUsed}`);
+            }
+        } else if (globalModelOverride) {
+            // Using Custom model - apply dashboard/status bar override
+            actualModelUsed = globalModelOverride;
+            console.log(`[ROUTING] Custom model → Using dashboard: ${globalModelOverride}`);
         } else {
-            console.log(`[API] Extension using UI model: ${resolvedModel} (Opus/Haiku/Default - pass-through)`);
+            // No override set, use resolved model as-is
+            console.log(`[ROUTING] Using: ${actualModelUsed} (no override)`);
         }
+
+        resolvedModel = actualModelUsed;
 
         // ================= MODEL INFO INJECTION =================
         // Add active model info to system prompt so AI knows what it's using

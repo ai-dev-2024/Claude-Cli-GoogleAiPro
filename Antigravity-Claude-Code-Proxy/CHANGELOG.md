@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.0.1] - 2026-01-01
+
+### Added
+- **Robust Model Routing**: Claude Code UX dropdown now has highest priority
+  - Haiku → gemini-3-flash (mapped automatically)
+  - Opus → claude-opus-4-5-thinking  
+  - Sonnet/Default → claude-sonnet-4-5-thinking
+  - Custom model → Uses dashboard/status bar selection
+- **Status Bar Sync**: Status bar now updates to show actual model being used
+- **Faster Offline Detection**: 2-second timeout for quick status bar updates
+
+### Changed
+- Reduced polling interval from 5 seconds to 2 seconds
+- Improved extension connection retry logic (1-second delays)
+
+### Fixed
+- Status bar not updating when switching models via Claude Code dropdown
+- Model priority conflicts between dashboard and extension
+
 ## [4.0.0] - 2026-01-01
 
 ### Added
