@@ -3,17 +3,14 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Version-4.0.2-blue?style=for-the-badge" alt="Version 4.0.2">
+  <img src="https://img.shields.io/badge/Version-4.1.0-blue?style=for-the-badge" alt="Version 4.1.0">
   <img src="https://img.shields.io/badge/Claude_Code-Compatible-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Compatible">
   <img src="https://img.shields.io/badge/Antigravity-Powered-00D4AA?style=for-the-badge" alt="Antigravity Powered">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
   <a href="https://ko-fi.com/ai_dev_2024"><img src="https://img.shields.io/badge/Support%20Me-Ko--fi-red?style=for-the-badge&logo=ko-fi" alt="Support Me"></a>
 </p>
 
-<h1 align="center">
-  <img src="docs/images/logo.png" alt="Logo" width="40" height="40" style="vertical-align: middle; margin-right: 12px; border-radius: 8px;">
-  Antigravity Claude Code Proxy
-</h1>
+<h1 align="center">🚀 Antigravity Claude Code Proxy</h1>
 
 <p align="center">
   <strong>Use Claude Code CLI with Gemini, GPT-5, Grok, and 20+ AI models</strong>
@@ -273,4 +270,18 @@ MIT License - See [LICENSE](LICENSE) for details.
   <br>
   <a href="https://github.com/ai-dev-2024/Antigravity-Claude-Code-Proxy/issues">Report Bug</a> •
   <a href="https://github.com/ai-dev-2024/Antigravity-Claude-Code-Proxy/issues">Request Feature</a>
+</p>
+
+<br>
+
+<h2 align="center">❤️ Support This Project</h2>
+
+<p align="center">
+  If you find this project helpful, please consider buying me a coffee! Your support helps keep the updates coming.
+</p>
+
+<p align="center">
+  <a href="https://ko-fi.com/ai_dev_2024">
+    <img src="https://storage.ko-fi.com/cdn/kofi2.png?v=3" alt="Buy Me A Coffee" height="50">
+  </a>
 </p>
