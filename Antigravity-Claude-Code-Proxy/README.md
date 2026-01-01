@@ -1,6 +1,4 @@
-<p align="center">
-  <img src="docs/images/banner.png" alt="Antigravity Claude Code Proxy Banner" width="100%">
-</p>
+![Antigravity Claude Code Proxy Banner](docs/images/banner.png)
 
 <p align="center">
   <img src="https://img.shields.io/badge/Version-4.1.0-blue?style=for-the-badge" alt="Version 4.1.0">
