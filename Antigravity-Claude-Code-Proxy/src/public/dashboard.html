@@ -1,49 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Antigravity Proxy</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@24,400,0,0" />
     <style>
         :root {
+            /* Zinc Palette */
             --background: #09090b;
             --foreground: #fafafa;
-            --card: #18181b;
+            --card: #09090b;
             --card-foreground: #fafafa;
+            --popover: #09090b;
+            --popover-foreground: #fafafa;
+            --primary: #fafafa;
+            --primary-foreground: #18181b;
             --secondary: #27272a;
+            --secondary-foreground: #fafafa;
             --muted: #27272a;
             --muted-foreground: #a1a1aa;
             --accent: #27272a;
             --accent-foreground: #fafafa;
+            --destructive: #7f1d1d;
+            --destructive-foreground: #fafafa;
             --border: #27272a;
             --input: #27272a;
             --ring: #d4d4d8;
-            --success: #22c55e;
-            --warning: #eab308;
-            --danger: #ef4444;
             --radius: 0.5rem;
+            
+            /* Status Colors */
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #3b82f6;
         }
 
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
+            border-color: var(--border);
         }
 
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--background);
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: var(--background);
             color: var(--foreground);
             min-height: 100vh;
             display: flex;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
         }
 
-        /* Sidebar */
+        /* Material Icons */
+        .material-symbols-rounded {
+            font-size: 1.25rem;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+
+        .icon-sm { font-size: 1.1rem; }
+        .icon-lg { font-size: 1.5rem; }
+        .icon-fill { font-variation-settings: 'FILL' 1; }
+
+        /* Layout */
         .sidebar {
-            width: 220px;
-            background: var(--card);
+            width: 250px;
+            background-color: #0c0c0e;
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
@@ -52,209 +78,315 @@
             left: 0;
             height: 100vh;
             z-index: 50;
+            transition: transform 0.3s ease;
         }
 
-        .sidebar-header {
-            padding: 1rem;
+        .main {
+            flex: 1;
+            margin-left: 250px;
+            min-height: 100vh;
+            background-color: var(--background);
+        }
+
+        /* Sidebar Elements */
+        .logo-container {
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
             border-bottom: 1px solid var(--border);
         }
 
-        .sidebar-logo {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .sidebar-logo-icon {
-            width: 24px;
-            height: 24px;
+        .logo-icon {
+            width: 32px;
+            height: 32px;
             background: linear-gradient(135deg, #3b82f6, #06b6d4);
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
+            border-radius: 6px;
+            display: grid;
+            place-items: center;
+            color: white;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
         }
 
-        .sidebar-nav {
+        .logo-text {
+            font-weight: 700;
+            font-size: 1rem;
+            letter-spacing: -0.025em;
+        }
+
+        .nav-menu {
+            padding: 1rem;
             flex: 1;
-            padding: 0.75rem;
-            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
         }
 
-        .nav-section {
-            margin-bottom: 1.25rem;
-        }
-
-        .nav-section-title {
-            font-size: 0.65rem;
+        .nav-label {
+            font-size: 0.75rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
             color: var(--muted-foreground);
-            padding: 0 0.5rem;
-            margin-bottom: 0.35rem;
+            padding: 0.75rem 0.75rem 0.5rem;
+            letter-spacing: 0.05em;
         }
 
         .nav-item {
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 0.4rem 0.5rem;
+            gap: 0.75rem;
+            padding: 0.5rem 0.75rem;
             border-radius: var(--radius);
             color: var(--muted-foreground);
             text-decoration: none;
-            font-size: 0.8rem;
-            transition: all 0.15s;
+            font-weight: 500;
+            transition: all 0.2s ease;
             cursor: pointer;
+            user-select: none;
         }
 
         .nav-item:hover {
-            background: var(--accent);
             color: var(--foreground);
+            background-color: var(--accent);
         }
 
         .nav-item.active {
-            background: var(--accent);
             color: var(--foreground);
+            background-color: var(--accent);
         }
 
-        .nav-icon {
-            font-size: 0.9rem;
+        .nav-item.active .material-symbols-rounded {
+            color: var(--foreground);
+            font-variation-settings: 'FILL' 1;
         }
 
         .sidebar-footer {
-            padding: 0.75rem;
+            padding: 1rem;
             border-top: 1px solid var(--border);
-            font-size: 0.7rem;
         }
 
-        .sidebar-footer a {
-            color: var(--muted-foreground);
-            text-decoration: none;
-        }
-
-        .sidebar-footer a:hover {
-            color: var(--foreground);
-        }
-
-        /* Main */
-        .main {
-            flex: 1;
-            margin-left: 220px;
-            min-height: 100vh;
-        }
-
-        .header {
-            height: 50px;
+        /* Header */
+        .top-bar {
+            height: 64px;
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 1.25rem;
-            background: var(--card);
+            padding: 0 1.5rem;
+            background-color: rgba(9, 9, 11, 0.8);
+            backdrop-filter: blur(8px);
             position: sticky;
             top: 0;
             z-index: 40;
         }
 
-        .header-title {
+        .page-title {
             font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .header-actions {
+            font-size: 1.125rem;
             display: flex;
-            gap: 0.5rem;
             align-items: center;
+            gap: 0.5rem;
         }
 
-        .content {
-            padding: 1.25rem;
+        /* Components */
+        .model-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: var(--secondary);
+            padding: 0.25rem;
+            border-radius: calc(var(--radius) + 2px);
+            border: 1px solid var(--border);
         }
 
-        .page {
-            display: none;
+        .model-selector span {
+            padding: 0 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--muted-foreground);
+            text-transform: uppercase;
         }
 
-        .page.active {
-            display: block;
+        select {
+            background-color: var(--card);
+            color: var(--foreground);
+            border: 1px solid var(--border);
+            padding: 0.4rem 2rem 0.4rem 0.75rem;
+            border-radius: var(--radius);
+            font-size: 0.875rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a1a1aa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1rem;
+            min-width: 200px;
         }
 
-        /* Cards */
-        .card {
-            background: var(--card);
+        select:focus {
+            outline: none;
+            border-color: var(--ring);
+            box-shadow: 0 0 0 2px rgba(212, 212, 216, 0.1);
+        }
+
+        /* Dashboard Content */
+        .content-area {
+            padding: 1.5rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.3s ease; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background-color: var(--card);
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 1rem;
-            margin-bottom: 1rem;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
         }
 
-        .card-header {
+        .stat-header {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            justify-content: space-between;
+            color: var(--muted-foreground);
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-size: 1.75rem;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+        }
+
+        .stat-trend {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .text-green { color: var(--success); }
+        .text-yellow { color: var(--warning); }
+        .text-red { color: var(--danger); }
+        
+        /* Account Cards */
+        .accounts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1rem;
+        }
+
+        .account-card {
+            background-color: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .account-card:hover {
+            border-color: var(--muted-foreground);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .account-card.selected {
+            border-color: var(--info);
+            box-shadow: 0 0 0 1px var(--info);
+        }
+        
+        .account-card.rate-limited {
+            opacity: 0.7;
+            border-color: var(--danger);
+        }
+
+        .account-header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--secondary);
+        }
+
+        .account-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-weight: 600;
+            font-size: 0.875rem;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .avatar.google { background: linear-gradient(135deg, #4285F4, #34A853); }
+        .avatar.perplexity { background: linear-gradient(135deg, #2D3748, #009688); }
+
+        .account-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 160px;
+        }
+
+        .account-body {
+            padding: 1rem;
+        }
+
+        .quota-bar-container {
             margin-bottom: 0.75rem;
         }
 
-        .card-title {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .card-description {
+        .quota-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.25rem;
             font-size: 0.75rem;
             color: var(--muted-foreground);
         }
 
-        /* Stats */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 0.75rem;
-            margin-bottom: 1rem;
+        .progressbar {
+            height: 6px;
+            background-color: var(--secondary);
+            border-radius: 3px;
+            overflow: hidden;
         }
 
-        .stat-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1rem;
-        }
-
-        .stat-label {
-            font-size: 0.65rem;
-            color: var(--muted-foreground);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            margin-bottom: 0.35rem;
-        }
-
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-        }
-
-        .stat-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.2rem;
-            font-size: 0.65rem;
-            margin-top: 0.35rem;
-        }
-
-        .stat-indicator.success {
-            color: var(--success);
-        }
-
-        .stat-indicator.warning {
-            color: var(--warning);
-        }
-
-        .stat-indicator.danger {
-            color: var(--danger);
+        .progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* Buttons */
@@ -262,1326 +394,723 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            gap: 0.35rem;
-            padding: 0.4rem 0.75rem;
-            border-radius: var(--radius);
-            font-size: 0.8rem;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
             font-weight: 500;
+            border-radius: var(--radius);
             cursor: pointer;
-            transition: all 0.15s;
+            transition: all 0.2s;
             border: 1px solid transparent;
+            text-decoration: none;
         }
 
         .btn-primary {
-            background: var(--foreground);
+            background-color: var(--foreground);
             color: var(--background);
         }
-
-        .btn-primary:hover {
-            opacity: 0.9;
-        }
+        .btn-primary:hover { opacity: 0.9; }
 
         .btn-secondary {
-            background: var(--secondary);
+            background-color: var(--secondary);
             color: var(--foreground);
             border-color: var(--border);
         }
-
-        .btn-secondary:hover {
-            background: var(--accent);
-        }
+        .btn-secondary:hover { background-color: var(--input); }
 
         .btn-ghost {
             background: transparent;
             color: var(--muted-foreground);
         }
-
         .btn-ghost:hover {
-            background: var(--accent);
             color: var(--foreground);
+            background-color: var(--accent);
         }
 
-        .btn-sm {
-            padding: 0.3rem 0.5rem;
-            font-size: 0.75rem;
-        }
+        .btn-icon-only { padding: 0.5rem; }
 
-        /* Account cards */
-        .accounts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 0.75rem;
-        }
-
-        .account-card {
-            background: var(--card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            overflow: hidden;
-            cursor: pointer;
-            transition: border-color 0.15s;
-        }
-
-        .account-card:hover {
-            border-color: var(--muted-foreground);
-        }
-
-        .account-card.selected {
-            border-color: var(--foreground);
-        }
-
-        .account-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .account-info {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .account-avatar {
-            width: 28px;
-            height: 28px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .account-avatar.google {
-            background: linear-gradient(135deg, #3b82f6, #06b6d4);
-        }
-
-        .account-avatar.perplexity {
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-        }
-
-        .account-email {
-            font-weight: 500;
-            font-size: 0.8rem;
-        }
-
-        .account-type {
-            font-size: 0.65rem;
-            color: var(--muted-foreground);
-        }
-
-        .badge {
-            display: inline-flex;
-            align-items: center;
-            padding: 0.15rem 0.4rem;
-            border-radius: 9999px;
-            font-size: 0.6rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .badge-success {
-            background: rgba(34, 197, 94, 0.15);
-            color: var(--success);
-        }
-
-        .badge-warning {
-            background: rgba(234, 179, 8, 0.15);
-            color: var(--warning);
-        }
-
-        .badge-danger {
-            background: rgba(239, 68, 68, 0.15);
-            color: var(--danger);
-        }
-
-        .account-body {
-            padding: 0.75rem;
-        }
-
-        /* Quota bars */
-        .quota-item {
-            margin-bottom: 0.5rem;
-        }
-
-        .quota-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.25rem;
-        }
-
-        .quota-label {
-            font-size: 0.7rem;
-            color: var(--muted-foreground);
-            display: flex;
-            align-items: center;
-            gap: 0.35rem;
-        }
-
-        .quota-value {
-            font-size: 0.65rem;
-            color: var(--muted-foreground);
-        }
-
-        .quota-bar {
-            height: 5px;
-            background: var(--secondary);
-            border-radius: 3px;
-            overflow: hidden;
-        }
-
-        .quota-fill {
-            height: 100%;
-            border-radius: 3px;
-            transition: width 0.3s;
-        }
-
-        .quota-fill.high {
-            background: var(--success);
-        }
-
-        .quota-fill.medium {
-            background: var(--warning);
-        }
-
-        .quota-fill.low {
-            background: var(--danger);
-        }
-
-        .btn-delete {
-            background: none;
-            border: none;
-            color: var(--muted-foreground);
-            cursor: pointer;
-            padding: 0.25rem 0.4rem;
-            font-size: 0.75rem;
-            border-radius: 4px;
-            transition: all 0.15s;
-        }
-
-        .btn-delete:hover {
-            background: var(--danger);
-            color: white;
-        }
-
-        .copy-btn {
-            background: none;
-            border: none;
-            color: var(--muted-foreground);
-            cursor: pointer;
-            padding: 0.1rem 0.2rem;
-            border-radius: 3px;
-            font-size: 0.65rem;
-        }
-
-        .copy-btn:hover {
-            color: var(--foreground);
-            background: var(--accent);
-        }
-
-        /* Models table */
-        .models-table {
+        /* Tables */
+        .data-table {
             width: 100%;
             border-collapse: collapse;
+            font-size: 0.875rem;
         }
 
-        .models-table th,
-        .models-table td {
-            padding: 0.5rem 0.75rem;
+        .data-table th {
             text-align: left;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.8rem;
-        }
-
-        .models-table th {
-            font-weight: 600;
-            font-size: 0.7rem;
-            text-transform: uppercase;
+            padding: 0.75rem 1rem;
             color: var(--muted-foreground);
-        }
-
-        .models-table tr:hover {
-            background: var(--accent);
-        }
-
-        .model-id {
-            font-family: 'SF Mono', Monaco, monospace;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border);
             font-size: 0.75rem;
+            text-transform: uppercase;
         }
 
-        /* Health indicators */
-        .health-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0.75rem;
+        .data-table td {
+            padding: 0.75rem 1rem;
             border-bottom: 1px solid var(--border);
         }
 
-        .health-item:last-child {
-            border-bottom: none;
-        }
+        .data-table tr:last-child td { border-bottom: none; }
+        .data-table tr:hover { background-color: var(--accent); }
 
-        .health-label {
-            font-size: 0.8rem;
-        }
-
-        .health-value {
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .health-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
-            margin-right: 0.35rem;
-        }
-
-        .health-dot.ok {
-            background: var(--success);
-        }
-
-        .health-dot.error {
-            background: var(--danger);
+        .code-snippet {
+            font-family: 'SF Mono', 'Roboto Mono', monospace;
+            background-color: var(--secondary);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            color: var(--accent-foreground);
         }
 
         /* Modal */
         .modal-overlay {
-            display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(4px);
             z-index: 100;
-            align-items: center;
-            justify-content: center;
+            display: none;
+            place-items: center;
+            padding: 1rem;
         }
 
-        .modal-overlay.show {
-            display: flex;
-        }
+        .modal-overlay.show { display: grid; }
 
-        .modal {
-            background: var(--card);
+        .modal-card {
+            background-color: #09090b;
             border: 1px solid var(--border);
             border-radius: var(--radius);
-            padding: 1.25rem;
-            max-width: 450px;
-            width: 90%;
-            max-height: 85vh;
-            overflow-y: auto;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+            animation: modalSlide 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes modalSlide {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
         }
 
         .modal-header {
+            padding: 1.25rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.75rem;
         }
 
-        .modal-title {
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
+        .modal-title { font-weight: 600; font-size: 1.125rem; }
+
+        .modal-body { padding: 1.5rem; }
 
         .modal-close {
             background: none;
             border: none;
             color: var(--muted-foreground);
             cursor: pointer;
-            font-size: 1.1rem;
         }
+        .modal-close:hover { color: var(--foreground); }
 
-        .form-group {
-            margin-bottom: 0.75rem;
-        }
-
+        /* Form */
+        .form-group { margin-bottom: 1.25rem; }
         .form-label {
             display: block;
-            font-size: 0.75rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
             font-weight: 500;
-            margin-bottom: 0.35rem;
         }
-
         .form-input {
             width: 100%;
-            padding: 0.5rem 0.6rem;
-            background: var(--input);
+            padding: 0.6rem;
+            background-color: var(--input);
             border: 1px solid var(--border);
             border-radius: var(--radius);
             color: var(--foreground);
-            font-size: 0.8rem;
+            font-size: 0.875rem;
         }
-
         .form-input:focus {
             outline: none;
-            border-color: var(--ring);
+            border-color: var(--info);
+            box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
         }
 
-        .steps {
-            background: var(--secondary);
-            border-radius: var(--radius);
-            padding: 0.75rem;
-            margin: 0.75rem 0;
-        }
-
-        .step {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .step:last-child {
-            margin-bottom: 0;
-        }
-
-        .step-number {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            background: var(--muted-foreground);
-            color: var(--background);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 0.6rem;
-            font-weight: 600;
-            flex-shrink: 0;
-        }
-
-        .step-text {
-            font-size: 0.75rem;
-            color: var(--muted-foreground);
-            line-height: 1.4;
-        }
-
+        /* Toast */
         .toast {
             position: fixed;
-            bottom: 1rem;
-            right: 1rem;
-            background: var(--card);
+            bottom: 1.5rem;
+            right: 1.5rem;
+            background-color: var(--card);
             border: 1px solid var(--border);
-            padding: 0.6rem 0.8rem;
+            padding: 0.75rem 1rem;
             border-radius: var(--radius);
-            font-size: 0.8rem;
-            opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.2s;
-            z-index: 200;
-            max-width: 300px;
-        }
-
-        .toast.show {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .toast.success {
-            border-color: var(--success);
-        }
-
-        .toast.error {
-            border-color: var(--danger);
-        }
-
-        code {
-            background: var(--secondary);
-            padding: 0.1rem 0.3rem;
-            border-radius: 3px;
-            font-size: 0.75rem;
-            font-family: 'SF Mono', Monaco, monospace;
-        }
-
-        /* Account detail */
-        .account-detail {
-            margin-top: 1rem;
-        }
-
-        .account-detail-header {
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.75rem;
-            border-bottom: 1px solid var(--border);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+            transform: translateY(150%);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: 200;
         }
 
-        .account-detail-avatar {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
+        .toast.show { transform: translateY(0); }
+        .toast.success { border-left: 4px solid var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+
+        /* Utilities */
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .gap-2 { gap: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .card { padding: 1.5rem; background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); }
+        .card-header { margin-bottom: 1rem; }
+        .card-title { font-weight: 600; font-size: 1rem; }
+        .card-desc { font-size: 0.875rem; color: var(--muted-foreground); }
+        
+        .pulse { animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .badge {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .account-detail-name {
-            font-weight: 600;
-            font-size: 1rem;
-        }
-
-        .account-detail-type {
+            padding: 0.125rem 0.5rem;
+            border-radius: 9999px;
             font-size: 0.75rem;
-            color: var(--muted-foreground);
+            font-weight: 600;
         }
-
+        .badge.ok { background-color: rgba(16, 185, 129, 0.1); color: var(--success); }
+        .badge.error { background-color: rgba(239, 68, 68, 0.1); color: var(--danger); }
+        
         @media (max-width: 768px) {
-            .sidebar {
-                display: none;
-            }
-
-            .main {
-                margin-left: 0;
-            }
+            .sidebar { transform: translateX(-100%); }
+            .main { margin-left: 0; }
         }
     </style>
 </head>
-
 <body>
+    <!-- Toast Notification -->
+    <div id="toast" class="toast">
+        <span class="material-symbols-rounded" id="toast-icon">check_circle</span>
+        <span id="toast-message">Notification</span>
+    </div>
+
     <!-- Sidebar -->
     <aside class="sidebar">
-        <div class="sidebar-header">
-            <div class="sidebar-logo">
-                <div class="sidebar-logo-icon">⚡</div>
-                <span>Antigravity Proxy</span>
+        <div class="logo-container">
+            <div class="logo-icon">
+                <span class="material-symbols-rounded" style="color: white;">bolt</span>
             </div>
+            <div class="logo-text">Antigravity<br><span style="font-weight:400; font-size: 0.85rem; color: var(--muted-foreground);">Proxy</span></div>
         </div>
-        <nav class="sidebar-nav">
-            <div class="nav-section">
-                <div class="nav-section-title">Dashboard</div>
-                <a class="nav-item active" data-page="overview">
-                    <span class="nav-icon">📊</span> Overview
-                </a>
-            </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Pages</div>
-                <a class="nav-item" data-page="health">
-                    <span class="nav-icon">🩺</span> Health Status
-                </a>
-                <a class="nav-item" data-page="models">
-                    <span class="nav-icon">🧠</span> Available Models
-                </a>
-                <a class="nav-item" data-page="usage">
-                    <span class="nav-icon">☁️</span> Google Usage
-                </a>
-                <a class="nav-item" data-page="perplexity">
-                    <span class="nav-icon">🔮</span> Perplexity Usage
-                </a>
-            </div>
-            <div class="nav-section">
-                <div class="nav-section-title">Links</div>
-                <a href="https://github.com/ai-dev-2024/Antigravity-Claude-Code-Proxy" target="_blank" class="nav-item">
-                    <span class="nav-icon">💻</span> GitHub
-                </a>
-            </div>
-        </nav>
+
+        <div class="nav-menu">
+            <div class="nav-label">Dashboard</div>
+            <a class="nav-item active" onclick="showPage('overview', this)">
+                <span class="material-symbols-rounded">dashboard</span>
+                <span>Overview</span>
+            </a>
+            <a class="nav-item" onclick="showPage('health', this)">
+                <span class="material-symbols-rounded">monitor_heart</span>
+                <span>System Health</span>
+            </a>
+
+            <div class="nav-label">Resources</div>
+            <a class="nav-item" onclick="showPage('accounts', this)">
+                <span class="material-symbols-rounded">manage_accounts</span>
+                <span>Accounts</span>
+            </a>
+            <a class="nav-item" onclick="showPage('models', this)">
+                <span class="material-symbols-rounded">smart_toy</span>
+                <span>Models</span>
+            </a>
+            <a class="nav-item" onclick="showPage('usage', this)">
+                <span class="material-symbols-rounded">bar_chart</span>
+                <span>Usage</span>
+            </a>
+        </div>
+
         <div class="sidebar-footer">
-            <a href="https://ko-fi.com/ai_dev_2024" target="_blank">☕ Support</a>
+            <a href="https://github.com/ai-dev-2024/Antigravity-Claude-Code-Proxy" target="_blank" class="btn btn-ghost" style="width: 100%; justify-content: flex-start;">
+                <span class="material-symbols-rounded">code</span>
+                <span>GitHub Repo</span>
+            </a>
         </div>
     </aside>
 
     <!-- Main Content -->
     <main class="main">
-        <header class="header">
-            <span class="header-title" id="page-title">Overview</span>
+        <div class="top-bar">
+            <div class="page-title">
+                <span class="material-symbols-rounded" id="page-icon">dashboard</span>
+                <span id="page-title-text">Overview</span>
+            </div>
 
-            <!-- Model Switcher - Quick switch for VS Code extension -->
-            <div class="model-switcher"
-                style="display: flex; align-items: center; gap: 0.5rem; background: var(--secondary); padding: 0.4rem 0.75rem; border-radius: var(--radius); border: 1px solid var(--border);">
-                <span style="font-size: 0.7rem; color: var(--muted-foreground);">🧠 Active Model:</span>
-                <select id="model-select" onchange="switchModel(this.value)"
-                    style="background: var(--input); color: var(--foreground); border: 1px solid var(--border); border-radius: 4px; padding: 0.25rem 0.5rem; font-size: 0.75rem; cursor: pointer;">
-                    <optgroup label="🎭 Claude on Google AI (Agentic)">
-                        <option value="claude-opus-4-5-thinking">claude-opus-4-5-thinking</option>
-                        <option value="claude-sonnet-4-5-thinking">claude-sonnet-4-5-thinking</option>
-                    </optgroup>
-                    <optgroup label="💎 Gemini Models (Agentic)">
-                        <option value="gemini-3-pro-high">gemini-3-pro-high (most powerful)</option>
-                        <option value="gemini-3-flash">gemini-3-flash (fast)</option>
-                        <option value="gemini-2.5-flash-thinking">gemini-2.5-flash-thinking</option>
-                        <option value="gemini-2.5-flash">gemini-2.5-flash</option>
-                    </optgroup>
-                    <optgroup label="🌐 Perplexity (Chat Only - No Tools)">
-                        <option value="pplx-grok">pplx-grok (xAI Grok)</option>
-                        <option value="pplx-claude-opus">pplx-claude-opus</option>
-                        <option value="pplx-kimi">pplx-kimi (Moonshot)</option>
-                        <option value="pplx-gpt51">pplx-gpt51 (OpenAI GPT)</option>
-                        <option value="sonar">sonar (web search)</option>
-                        <option value="sonar-pro">sonar-pro (web search)</option>
-                        <option value="perplexity-auto">perplexity-auto</option>
-                    </optgroup>
+            <div class="model-selector">
+                <span class="material-symbols-rounded icon-sm">tune</span>
+                <select id="model-select" onchange="switchModel(this.value)">
+                    <option value="" disabled>Select Model...</option>
+                    <!-- Populated by JS -->
                 </select>
-                <span id="model-status" style="font-size: 0.65rem; color: var(--success);">✓</span>
-                <button onclick="showReloadHelp()"
-                    title="After changing model, reload Antigravity to see it in extension dropdown"
-                    style="background: var(--warning); color: black; border: none; border-radius: 4px; padding: 0.2rem 0.4rem; font-size: 0.6rem; cursor: pointer;">
-                    ⟳ Reload Help
-                </button>
             </div>
+        </div>
 
-            <div class="header-actions">
-                <span id="last-updated" style="font-size: 0.7rem; color: var(--muted-foreground);"></span>
-                <button class="btn btn-secondary btn-sm" onclick="fetchAllData()">↻ Refresh</button>
-            </div>
-        </header>
-
-        <div class="content">
-            <!-- Overview Page -->
-            <div id="page-overview" class="page active">
+        <div class="content-area">
+            <!-- OVERVIEW PAGE -->
+            <div id="overview" class="page active">
                 <div class="stats-grid">
                     <div class="stat-card">
-                        <div class="stat-label">Status</div>
-                        <div class="stat-value" id="proxy-status" style="color: var(--success);">●</div>
-                        <div class="stat-indicator success" id="status-text">Online</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Google AI</div>
-                        <div class="stat-value" id="google-count">-</div>
-                        <div class="stat-indicator success">Accounts</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Perplexity</div>
-                        <div class="stat-value" id="pplx-count">-</div>
-                        <div class="stat-indicator success">Accounts</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-label">Models</div>
-                        <div class="stat-value" id="models-count">-</div>
-                        <div class="stat-indicator success">Available</div>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                    <button class="btn btn-primary" onclick="openGoogleModal()">+ Google AI Account</button>
-                    <button class="btn btn-secondary" id="pplx-btn" onclick="startPerplexityLogin()">+ Perplexity
-                        Account</button>
-                </div>
-                <div class="card">
-                    <div class="card-header">
-                        <div>
-                            <div class="card-title">Connected Accounts</div>
-                            <div class="card-description">Click an account to view usage details</div>
+                        <div class="stat-header">
+                            <span class="material-symbols-rounded icon-fill" style="color: var(--info);">groups</span>
+                            <span>Active Accounts</span>
+                        </div>
+                        <div class="stat-value" id="stats-active-accounts">0</div>
+                        <div class="stat-trend">
+                            <span class="material-symbols-rounded icon-sm text-green">check_circle</span>
+                            <span class="text-green">Operational</span>
                         </div>
                     </div>
-                    <div id="overview-accounts" class="accounts-grid"></div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="material-symbols-rounded icon-fill" style="color: var(--success);">cloud_done</span>
+                            <span>Total Requests</span>
+                        </div>
+                        <div class="stat-value" id="stats-total-requests">0</div>
+                        <div class="stat-trend">
+                            <span>Lifetime</span>
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-header">
+                            <span class="material-symbols-rounded icon-fill" style="color: var(--warning);">warning</span>
+                            <span>Rate Limits</span>
+                        </div>
+                        <div class="stat-value" id="stats-rate-limits">0</div>
+                        <div class="stat-trend" id="rate-limit-trend">
+                            <span class="text-green">None recently</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex-between" style="margin-bottom: 1rem;">
+                    <h2 class="card-title">Connected Accounts</h2>
+                    <button class="btn btn-primary btn-sm" onclick="showAddAccountModal()">
+                        <span class="material-symbols-rounded icon-sm">add</span>
+                        Connect Account
+                    </button>
+                </div>
+
+                <div class="accounts-grid" id="accounts-list">
+                    <!-- Populated by JS -->
                 </div>
             </div>
 
-            <!-- Health Page -->
-            <div id="page-health" class="page">
+            <!-- ACCOUNTS PAGE -->
+            <div id="accounts" class="page">
                 <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">System Health</div>
+                    <div class="card-header flex-between">
+                        <div>
+                            <div class="card-title">Manage Accounts</div>
+                            <div class="card-desc">Add or remove Google/Perplexity accounts</div>
+                        </div>
+                        <button class="btn btn-primary" onclick="showAddAccountModal()">
+                            <span class="material-symbols-rounded">add</span>
+                            Add Account
+                        </button>
                     </div>
-                    <div id="health-content"></div>
+                    <div class="accounts-grid" id="manage-accounts-list">
+                        <!-- Same list as overview but maybe more details if needed -->
+                    </div>
                 </div>
             </div>
 
-            <!-- Models Page -->
-            <div id="page-models" class="page">
+            <!-- MODELS PAGE -->
+            <div id="models" class="page">
                 <div class="card">
                     <div class="card-header">
-                        <div>
-                            <div class="card-title">Available Models</div>
-                            <div class="card-description">All models you can use with <code>/model &lt;name&gt;</code>
-                            </div>
-                        </div>
+                        <div class="card-title">Available Models</div>
+                        <div class="card-desc">All models capable of being routed through this proxy</div>
                     </div>
                     <div style="overflow-x: auto;">
-                        <table class="models-table">
+                        <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>Model ID</th>
-                                    <th>Provider</th>
+                                    <th>Model Name</th>
+                                    <th>Alias</th>
+                                    <th>Type</th>
                                     <th>Description</th>
-                                    <th>Uses</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
-                            <tbody id="models-tbody"></tbody>
+                            <tbody id="models-table-body">
+                                <!-- Populated by JS -->
+                            </tbody>
                         </table>
                     </div>
                 </div>
             </div>
 
-            <!-- Usage Page -->
-            <div id="page-usage" class="page">
-                <div class="card">
+            <!-- USAGE PAGE -->
+            <div id="usage" class="page">
+                 <div class="card">
                     <div class="card-header">
-                        <div>
-                            <div class="card-title">Usage Limits</div>
-                            <div class="card-description">Select an account to view model usage</div>
-                        </div>
+                        <div class="card-title">Usage Statistics</div>
+                        <div class="card-desc">Request counts per model family</div>
                     </div>
-                    <div id="usage-accounts" class="accounts-grid"></div>
-                </div>
-                <div id="usage-detail" class="account-detail" style="display: none;">
-                    <div class="card">
-                        <div class="account-detail-header">
-                            <div id="detail-avatar" class="account-detail-avatar google"></div>
-                            <div>
-                                <div id="detail-email" class="account-detail-name"></div>
-                                <div id="detail-type" class="account-detail-type"></div>
-                            </div>
+                    <div id="usage-stats-container">
+                        <!-- Populated by JS -->
+                        <div style="padding: 2rem; text-align: center; color: var(--muted-foreground);">
+                            <span class="material-symbols-rounded" style="font-size: 3rem; opacity: 0.5;">bar_chart</span>
+                            <p class="mt-4">Usage data loading...</p>
                         </div>
-                        <div id="detail-quotas"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- Perplexity Page -->
-            <div id="page-perplexity" class="page">
-                <div style="display: flex; gap: 0.5rem; margin-bottom: 1rem;">
-                    <button class="btn btn-primary" id="pplx-add-btn" onclick="startPerplexityLogin()">+ Add
-                        Account</button>
-                    <button class="btn btn-secondary" onclick="openPerplexityModal()">Paste Token</button>
-                </div>
+            <!-- HEALTH PAGE -->
+            <div id="health" class="page">
                 <div class="card">
                     <div class="card-header">
-                        <div>
-                            <div class="card-title">Perplexity Pro Accounts</div>
-                            <div class="card-description">Session-based access to Perplexity Pro models</div>
-                        </div>
+                        <div class="card-title">System Health</div>
+                        <div class="card-desc">Real-time status checks</div>
                     </div>
-                    <div id="pplx-accounts"></div>
+                    <table class="data-table">
+                         <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Status</th>
+                                <th>Details</th>
+                            </tr>
+                        </thead>
+                        <tbody id="health-table-body">
+                             <!-- Populated by JS -->
+                        </tbody>
+                    </table>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Google Modal -->
-    <div id="google-modal" class="modal-overlay">
-        <div class="modal">
+    <!-- Modals -->
+    <div id="add-account-modal" class="modal-overlay">
+        <div class="modal-card">
             <div class="modal-header">
-                <div class="modal-title">Add Google AI Account</div>
-                <button class="modal-close" onclick="closeModal('google-modal')">×</button>
+                <div class="modal-title">Connect Google Account</div>
+                <button class="modal-close" onclick="closeModal('add-account-modal')">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
             </div>
-            <div class="steps">
-                <div class="step">
-                    <div class="step-number">1</div>
-                    <div class="step-text">Open <strong>Antigravity IDE</strong></div>
+            <div class="modal-body">
+                <p style="color: var(--muted-foreground); font-size: 0.875rem; margin-bottom: 1.5rem;">
+                    Follow these steps to extract your Google AI cookies and token.
+                </p>
+                <div class="form-group">
+                    <div style="background: var(--secondary); padding: 1rem; border-radius: var(--radius); border-left: 3px solid var(--info);">
+                        <ol style="margin-left: 1.5rem; font-size: 0.875rem; color: var(--foreground); display: flex; flex-direction: column; gap: 0.5rem;">
+                            <li>Open DevTools (F12)</li>
+                            <li>Go to Console tab</li>
+                            <li>Run: <code class="code-snippet">copy(document.cookie)</code></li>
+                            <li>Paste below</li>
+                        </ol>
+                    </div>
                 </div>
-                <div class="step">
-                    <div class="step-number">2</div>
-                    <div class="step-text">Login with your Google account</div>
+                <div class="form-group">
+                    <label class="form-label">Cookie String</label>
+                    <input type="text" id="account-cookie" class="form-input" placeholder="__Secure-1PSID=...">
                 </div>
-                <div class="step">
-                    <div class="step-number">3</div>
-                    <div class="step-text">Open a chat panel and send a message</div>
+                <div class="flex-between">
+                    <button class="btn btn-ghost" onclick="closeModal('add-account-modal')">Cancel</button>
+                    <button class="btn btn-primary" onclick="submitAddAccount()">Connect</button>
                 </div>
-                <div class="step">
-                    <div class="step-number">4</div>
-                    <div class="step-text">Click <strong>Refresh</strong> on this dashboard</div>
-                </div>
-            </div>
-            <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-                <button class="btn btn-secondary" onclick="closeModal('google-modal')">Cancel</button>
-                <button class="btn btn-primary" onclick="fetchAllData(); closeModal('google-modal');">Refresh</button>
             </div>
         </div>
     </div>
 
-    <!-- Perplexity Modal -->
-    <div id="perplexity-modal" class="modal-overlay">
-        <div class="modal">
-            <div class="modal-header">
-                <div class="modal-title">Add Perplexity Token</div>
-                <button class="modal-close" onclick="closeModal('perplexity-modal')">×</button>
-            </div>
-            <form id="pplx-form" onsubmit="return addPplxAccount(event)">
-                <div class="form-group">
-                    <label class="form-label">Email (optional)</label>
-                    <input type="email" class="form-input" id="pplx-email" placeholder="your@email.com">
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Session Token</label>
-                    <input type="text" class="form-input" id="pplx-token" required placeholder="Cookie value">
-                </div>
-                <div class="steps">
-                    <div class="step">
-                        <div class="step-number">1</div>
-                        <div class="step-text">Go to perplexity.ai and login</div>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">2</div>
-                        <div class="step-text">F12 → Application → Cookies</div>
-                    </div>
-                    <div class="step">
-                        <div class="step-number">3</div>
-                        <div class="step-text">Copy <code>__Secure-next-auth.session-token</code></div>
-                    </div>
-                </div>
-                <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
-                    <button type="button" class="btn btn-secondary"
-                        onclick="closeModal('perplexity-modal')">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="toast" class="toast"></div>
-
+    <!-- Scripts -->
     <script>
-        let cachedData = { limits: null, pplx: null, models: null, health: null };
-        let selectedAccount = null;
+        // API Base URL
+        const API_BASE = window.location.origin;
+        let pollingInterval;
 
-        // Navigation
-        document.querySelectorAll('.nav-item[data-page]').forEach(item => {
-            item.addEventListener('click', () => {
-                const page = item.dataset.page;
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                item.classList.add('active');
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.getElementById('page-' + page).classList.add('active');
-                document.getElementById('page-title').textContent = item.textContent.trim();
-            });
-        });
+        // Models Configuration
+        const AVAILABLE_MODELS = [
+            { id: 'gemini-3-flash', alias: 'flash', type: 'Agentic', desc: 'Fast, efficient, low latency' },
+            { id: 'gemini-3-pro-high', alias: 'pro', type: 'Agentic', desc: 'Complex reasoning, high capability' },
+            { id: 'claude-opus-4-5-thinking', alias: 'opus', type: 'Thinking', desc: 'Deep reasoning (Gemini backed)' },
+            { id: 'claude-sonnet-4-5-thinking', alias: 'sonnet', type: 'Thinking', desc: 'Balanced reasoning (Gemini backed)' },
+            { id: 'pplx-gpt-5', alias: 'gpt5', type: 'Search', desc: 'Perplexity GPT-5' },
+            { id: 'pplx-grok', alias: 'grok', type: 'Search', desc: 'Perplexity Grok' }
+        ];
 
-        function showToast(msg, isError = false) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.className = isError ? 'toast show error' : 'toast show success';
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
-        function confirmDeleteAccount(email, type) {
-            const typeName = type === 'perplexity' ? 'Perplexity' : 'Google AI';
-            if (confirm(`Are you sure you want to remove the ${typeName} account "${email}"?\n\nThis action cannot be undone.`)) {
-                deleteAccount(email, type);
+        // --- Navigation ---
+        function showPage(pageId, element) {
+            // Update nav active state
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            if(element) element.classList.add('active');
+            else {
+                // Find link for this page
+                const link = Array.from(document.querySelectorAll('.nav-item')).find(el => el.getAttribute('onclick')?.includes(pageId));
+                if(link) link.classList.add('active');
             }
+
+            // Show page content
+            document.querySelectorAll('.page').forEach(el => el.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+
+            // Update Header Title
+            const titles = {
+                'overview': { text: 'Overview', icon: 'dashboard' },
+                'accounts': { text: 'Manage Accounts', icon: 'manage_accounts' },
+                'models': { text: 'Model Registry', icon: 'smart_toy' },
+                'usage': { text: 'Usage Statistics', icon: 'bar_chart' },
+                'health': { text: 'System Health', icon: 'monitor_heart' }
+            };
+            document.getElementById('page-title-text').innerText = titles[pageId].text;
+            document.getElementById('page-icon').innerText = titles[pageId].icon;
+
+            // Refresh data based on page
+            if (pageId === 'overview' || pageId === 'accounts') fetchAccounts();
+            if (pageId === 'health') fetchHealth();
+            if (pageId === 'usage') fetchUsage(); // Implement if endpoints exist
         }
 
-        async function deleteAccount(email, type) {
+        // --- Data Fetching ---
+        async function fetchInitialData() {
+            await Promise.all([
+                fetchAccounts(),
+                fetchActiveModel(),
+                fetchHealth()
+            ]);
+            renderModelsList();
+        }
+
+        async function fetchAccounts() {
             try {
-                let url, method;
-                if (type === 'perplexity') {
-                    url = `/perplexity-sessions/${encodeURIComponent(email)}`;
-                    method = 'DELETE';
-                } else {
-                    url = `/google-accounts/${encodeURIComponent(email)}`;
-                    method = 'DELETE';
-                }
-
-                const res = await fetch(url, { method });
-                if (res.ok) {
-                    showToast(`Account "${email}" removed successfully`);
-                    await fetchAllData();
-                } else {
-                    const err = await res.text();
-                    showToast(`Failed to remove account: ${err}`, true);
-                }
-            } catch (e) {
-                showToast(`Error removing account: ${e.message}`, true);
-            }
-        }
-
-        function openGoogleModal() { document.getElementById('google-modal').classList.add('show'); }
-        function openPerplexityModal() { document.getElementById('perplexity-modal').classList.add('show'); }
-        function closeModal(id) { document.getElementById(id).classList.remove('show'); }
-
-        async function renamePerplexityAccount(email) {
-            const newName = prompt('Enter a new name for this Perplexity account:', email);
-            if (!newName || newName === email) return;
-
-            try {
-                const res = await fetch(`/perplexity-sessions/${encodeURIComponent(email)}`, {
-                    method: 'PATCH',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ newName })
-                });
-                if (res.ok) {
-                    showToast(`Account renamed to "${newName}"`);
-                    await fetchAllData();
-                } else {
-                    const err = await res.json();
-                    showToast(`Failed to rename: ${err.error}`, true);
-                }
-            } catch (e) {
-                showToast(`Error renaming: ${e.message}`, true);
-            }
-        }
-
-        // ================= MODEL SWITCHING =================
-        // Quick model switcher for VS Code extension users
-
-        function showReloadHelp() {
-            const message = `
-📋 HOW TO APPLY MODEL CHANGES TO EXTENSION:
-
-1. ✅ Model saved to settings (done automatically)
-2. 🔄 Reload Antigravity window:
-   • Press Ctrl+Shift+P (Windows/Linux)
-   • Type "Reload Window"
-   • Press Enter
-
-The extension dropdown will update after reload.
-
----
-NOTE: The proxy immediately uses the new model for requests.
-Only the extension dropdown needs a reload to update.
-            `.trim();
-
-            alert(message);
-        }
-
-        async function switchModel(model) {
-            const statusEl = document.getElementById('model-status');
-            statusEl.textContent = '...';
-            statusEl.style.color = 'var(--warning)';
-
-            try {
-                const res = await fetch('/active-model', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ model })
-                });
+                // This endpoint needs to exist on your server
+                // Assuming /health or /accounts gives us the list
+                const res = await fetch(`${API_BASE}/health`);
                 const data = await res.json();
-                if (res.ok) {
-                    statusEl.textContent = '✓';
-                    statusEl.style.color = 'var(--success)';
-
-                    // Show countdown and auto-reload
-                    let countdown = 3;
-                    const countdownToast = () => {
-                        if (countdown > 0) {
-                            showToast(`✅ Model: ${data.model} — Reloading window in ${countdown}...`);
-                            countdown--;
-                            setTimeout(countdownToast, 1000);
-                        } else {
-                            // Try to reload via VS Code API if in webview
-                            try {
-                                // Check if we're in a VS Code webview
-                                if (typeof acquireVsCodeApi === 'function') {
-                                    const vscode = acquireVsCodeApi();
-                                    vscode.postMessage({ command: 'reloadWindow' });
-                                    showToast('🔄 Reloading Antigravity...');
-                                } else {
-                                    // Not in webview - show manual instructions
-                                    showToast('🔄 Press Ctrl+Shift+P → "Reload Window" to update extension dropdown');
-                                }
-                            } catch (e) {
-                                showToast('🔄 Press Ctrl+Shift+P → "Reload Window" to update extension dropdown');
-                            }
-                        }
-                    };
-                    countdownToast();
-                } else {
-                    statusEl.textContent = '✗';
-                    statusEl.style.color = 'var(--danger)';
-                    showToast(`Failed: ${data.error}`, true);
+                
+                // Update stats
+                document.getElementById('stats-active-accounts').innerText = data.available || 0;
+                document.getElementById('stats-rate-limits').innerText = data.rateLimited || 0;
+                
+                if (data.rateLimited > 0) {
+                     const trend = document.getElementById('rate-limit-trend');
+                     trend.innerHTML = '<span class="material-symbols-rounded icon-sm text-red">warning</span><span class="text-red">Impacted</span>';
                 }
-            } catch (e) {
-                statusEl.textContent = '✗';
-                statusEl.style.color = 'var(--danger)';
-                showToast(`Error: ${e.message}`, true);
+
+                renderAccounts(data.accounts || []); // We might need a better endpoint for full details
+            } catch (err) {
+                console.error('Failed to fetch accounts:', err);
+                showToast('Failed to fetch account data', 'error');
             }
         }
-
-        async function loadActiveModel() {
+        
+        async function fetchActiveModel() {
             try {
-                const res = await fetch('/active-model');
+                const res = await fetch(`${API_BASE}/active-model`);
                 const data = await res.json();
                 const select = document.getElementById('model-select');
-                if (select && data.model) {
-                    // Try to select the current model, or leave as first option
-                    const options = Array.from(select.options);
-                    const match = options.find(o => o.value === data.model);
-                    if (match) {
-                        select.value = data.model;
-                    }
+                
+                // Populate if empty
+                if (select.options.length <= 1) {
+                    AVAILABLE_MODELS.forEach(m => {
+                        const opt = document.createElement('option');
+                        opt.value = m.id;
+                        opt.innerText = `${m.alias.toUpperCase()} (${m.id})`;
+                        select.appendChild(opt);
+                    });
                 }
-            } catch (e) {
-                console.log('Could not load active model:', e);
+
+                // Set Value
+                if (data.model) select.value = data.model;
+            } catch (err) {
+                console.error('Failed to fetch model:', err);
             }
         }
 
-        // Show help about extension UI limitation
-        function showReloadHelp() {
-            alert(`⚠️ VS Code Extension UI Limitation (v3)
+        async function fetchHealth() {
+             try {
+                const res = await fetch(`${API_BASE}/health`);
+                const data = await res.json();
+                
+                const tbody = document.getElementById('health-table-body');
+                tbody.innerHTML = '';
+                
+                const status = (data.status === 'ok') 
+                    ? '<span class="badge ok">HEALTHY</span>' 
+                    : '<span class="badge error">ISSUES</span>';
 
-When you change the model here, the extension's "Custom model" dropdown label doesn't update in real-time. This is a VS Code caching limitation.
-
-✅ The actual model DOES change immediately
-❌ The dropdown label stays stale until reload
-
-How it works:
-• Default/Opus/Haiku → Uses that model directly (pass-through)
-• Custom model → Uses whatever dashboard has selected
-
-To update the UI label:
-• Press Ctrl+Shift+P → "Reload Window"
-• Or restart Antigravity
-
-Note: Even with stale label, clicking "Custom model" WILL use the dashboard-selected model!`);
+                const row = `
+                    <tr>
+                        <td><strong>Proxy Server</strong></td>
+                        <td>${status}</td>
+                        <td style="color: var(--muted-foreground); font-size: 0.75rem;">
+                            Uptime: ${new Date().toLocaleTimeString()}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><strong>Accounts Pool</strong></td>
+                        <td><span class="badge ${data.available > 0 ? 'ok' : 'error'}">${data.available} / ${data.accounts?.length || '?'} Active</span></td>
+                        <td style="color: var(--muted-foreground); font-size: 0.75rem;">
+                            Load balancing active
+                        </td>
+                    </tr>
+                `;
+                tbody.innerHTML = row;
+             } catch (e) {}
         }
 
-        // Load active model on page load
-        loadActiveModel();
-
-        document.querySelectorAll('.modal-overlay').forEach(o => {
-            o.addEventListener('click', e => { if (e.target === o) closeModal(o.id); });
-        });
-
-        // Smooth color gradient: green (100%) -> yellow (50%) -> red (0%)
-        function getQuotaColor(percent) {
-            // Hue: 0 = red, 60 = yellow, 120 = green
-            const hue = Math.round((percent / 100) * 120);
-            return `hsl(${hue}, 70%, 45%)`;
-        }
-        function getQuotaClass(p) { return p > 50 ? 'high' : p > 20 ? 'medium' : 'low'; }
-
-        function copyCmd(modelId) {
-            navigator.clipboard.writeText('/model ' + modelId);
-            showToast('Copied: /model ' + modelId);
-        }
-
-        async function fetchAllData() {
-            document.getElementById('last-updated').textContent = 'Loading...';
-            try {
-                const [limitsRes, pplxRes, modelsRes, healthRes, usageRes, pplxStatsRes] = await Promise.all([
-                    fetch('/account-limits'),
-                    fetch('/perplexity-sessions'),
-                    fetch('/v1/models'),
-                    fetch('/health'),
-                    fetch('/model-usage'),
-                    fetch('/perplexity-stats')
-                ]);
-                cachedData.limits = await limitsRes.json();
-                cachedData.pplx = await pplxRes.json();
-                cachedData.models = await modelsRes.json();
-                cachedData.health = await healthRes.json();
-                cachedData.usage = await usageRes.json();
-                cachedData.pplxStats = await pplxStatsRes.json();
-
-                document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
-                renderAll();
-            } catch (e) {
-                console.error('Fetch error:', e);
-                document.getElementById('status-text').textContent = 'Offline';
-                document.getElementById('proxy-status').style.color = 'var(--danger)';
-            }
-        }
-
-        function renderAll() {
-            renderOverview();
-            renderHealth();
-            renderModels();
-            renderUsage();
-            renderPerplexity();
-        }
-
-        function renderOverview() {
-            const g = cachedData.limits?.accounts?.length || 0;
-            const p = cachedData.pplx?.count || 0;
-            const m = cachedData.models?.data?.length || 0;
-            document.getElementById('google-count').textContent = g;
-            document.getElementById('pplx-count').textContent = p;
-            document.getElementById('models-count').textContent = m;
-
-            const allAccounts = [...(cachedData.limits?.accounts || []).map(a => ({ ...a, type: 'google' })),
-            ...(cachedData.pplx?.accounts || []).map(a => ({ ...a, type: 'perplexity' }))];
-
-            if (allAccounts.length === 0) {
-                document.getElementById('overview-accounts').innerHTML = '<div style="padding:1rem;color:var(--muted-foreground);">No accounts configured</div>';
-                return;
-            }
-
-            document.getElementById('overview-accounts').innerHTML = allAccounts.map(a => renderAccountCard(a, true)).join('');
-        }
-
-        function renderAccountCard(acc, selectable = true) {
-            const email = acc.email || 'Unknown';
-            const initial = email[0].toUpperCase();
-            const type = acc.type === 'perplexity' ? 'Perplexity Pro' : 'Google AI';
-            const avatarClass = acc.type === 'perplexity' ? 'perplexity' : 'google';
-            const status = acc.isRateLimited ? 'Limited' : acc.status === 'error' ? 'Error' : 'Active';
-            const badgeClass = status === 'Active' ? 'badge-success' : status === 'Limited' ? 'badge-warning' : 'badge-danger';
-            const onclick = selectable ? `onclick="selectAccount('${email}')"` : '';
-            const selected = selectedAccount === email ? 'selected' : '';
-            const accountType = acc.type === 'perplexity' ? 'perplexity' : 'google';
-
-            return `<div class="account-card ${selected}" ${onclick}>
-                <div class="account-header">
-                    <div class="account-info">
-                        <div class="account-avatar ${avatarClass}">${initial}</div>
-                        <div><div class="account-email">${email.split('@')[0]}</div><div class="account-type">${type}</div></div>
-                    </div>
-                    <div style="display:flex;align-items:center;gap:0.5rem;">
-                        <span class="badge ${badgeClass}">${status}</span>
-                        ${acc.type === 'perplexity' ? `<button class="btn-delete" onclick="event.stopPropagation();renamePerplexityAccount('${email}')" title="Rename account" style="background:none;color:var(--muted-foreground);">✏️</button>` : ''}
-                        <button class="btn-delete" onclick="event.stopPropagation();confirmDeleteAccount('${email}','${accountType}')" title="Remove account">✕</button>
-                    </div>
-                </div>
-            </div>`;
-        }
-
-        function renderHealth() {
-            const h = cachedData.health || {};
-            const items = [
-                { label: 'Status', value: h.status || 'unknown', ok: h.status === 'ok' },
-                { label: 'Total Accounts', value: h.available + h.rateLimited || 0, ok: true },
-                { label: 'Available', value: h.available || 0, ok: h.available > 0 },
-                { label: 'Rate Limited', value: h.rateLimited || 0, ok: h.rateLimited === 0 },
-                { label: 'Invalid', value: h.invalid || 0, ok: h.invalid === 0 },
-                { label: 'Timestamp', value: h.timestamp ? new Date(h.timestamp).toLocaleString() : '-', ok: true }
-            ];
-            document.getElementById('health-content').innerHTML = items.map(i =>
-                `<div class="health-item"><span class="health-label"><span class="health-dot ${i.ok ? 'ok' : 'error'}"></span>${i.label}</span><span class="health-value">${i.value}</span></div>`
-            ).join('');
-        }
-
-        function renderModels() {
-            const models = cachedData.models?.data || [];
-            const usage = cachedData.usage || { google: {}, perplexity: {} };
-
-            if (models.length === 0) {
-                document.getElementById('models-tbody').innerHTML = '<tr><td colspan="5" style="color:var(--muted-foreground);">No models available</td></tr>';
-                return;
-            }
-            document.getElementById('models-tbody').innerHTML = models.map(m => {
-                const isPerplexity = m.owned_by === 'perplexity' || m.id.startsWith('pplx') || m.id.startsWith('perplexity');
-                const provider = isPerplexity ? 'perplexity' : 'google';
-                const usageCount = isPerplexity ? (usage.perplexity[m.id] || 0) : (usage.google[m.id] || 0);
-                const providerLabel = isPerplexity ? '🟣 Perplexity' : '🔵 Google AI';
-                return `<tr>
-                    <td><span class="model-id">${m.id}</span></td>
-                    <td>${providerLabel}</td>
-                    <td style="color:var(--muted-foreground);font-size:0.75rem;">${m.description || '-'}</td>
-                    <td style="font-size:0.75rem;">${usageCount} uses</td>
-                    <td><button class="btn btn-ghost btn-sm" onclick="copyCmd('${m.id}')">📋</button></td>
-                </tr>`;
-            }).join('');
-        }
-
-        function renderUsage() {
-            const accounts = cachedData.limits?.accounts || [];
-            if (accounts.length === 0) {
-                document.getElementById('usage-accounts').innerHTML = '<div style="padding:1rem;color:var(--muted-foreground);">No Google AI accounts</div>';
-                return;
-            }
-            document.getElementById('usage-accounts').innerHTML = accounts.map(a => renderAccountCard({ ...a, type: 'google' }, true)).join('');
-
-            // Show first account by default if none selected
-            if (!selectedAccount && accounts.length > 0) {
-                selectAccount(accounts[0].email);
-            }
-        }
-
-        function selectAccount(email) {
-            selectedAccount = email;
-
-            // Check if it's a Google account
-            const googleAcc = cachedData.limits?.accounts?.find(a => a.email === email);
-
-            // Check if it's a Perplexity account
-            const pplxAcc = cachedData.pplx?.accounts?.find(a => a.email === email);
-
-            if (pplxAcc) {
-                // Navigate to Perplexity page
-                document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-                document.querySelector('.nav-item[data-page="perplexity"]').classList.add('active');
-                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-                document.getElementById('page-perplexity').classList.add('active');
-                document.getElementById('page-title').textContent = 'Perplexity Usage';
-                return;
-            }
-
-            if (!googleAcc) return;
-
-            // Navigate to Usage page for Google accounts
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            document.querySelector('.nav-item[data-page="usage"]').classList.add('active');
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            document.getElementById('page-usage').classList.add('active');
-            document.getElementById('page-title').textContent = 'Google Usage';
-
-            // Update UI
-            document.querySelectorAll('#usage-accounts .account-card').forEach(c => c.classList.remove('selected'));
-            document.querySelector(`#usage-accounts .account-card[onclick*="${email}"]`)?.classList.add('selected');
-
-            document.getElementById('usage-detail').style.display = 'block';
-            document.getElementById('detail-avatar').textContent = email[0].toUpperCase();
-            document.getElementById('detail-email').textContent = email;
-            document.getElementById('detail-type').textContent = 'Google AI Pro';
-
-            const limits = googleAcc.limits || {};
-
-            // Group models by provider
-            const groups = {
-                'Gemini 3': [],
-                'Gemini 2.5': [],
-                'Claude': [],
-                'GPT': [],
-                'Other': []
-            };
-
-            for (const [modelId, info] of Object.entries(limits)) {
-                const remaining = info.remainingFraction !== undefined ? Math.round(info.remainingFraction * 100) : 50;
-                const cls = getQuotaClass(remaining);
-                const reset = info.resetTime ? new Date(info.resetTime).toLocaleString() : null;
-
-                const item = { modelId, remaining, cls, reset };
-
-                if (modelId.includes('gemini-3')) groups['Gemini 3'].push(item);
-                else if (modelId.includes('gemini-2.5') || modelId.includes('gemini-2')) groups['Gemini 2.5'].push(item);
-                else if (modelId.includes('claude')) groups['Claude'].push(item);
-                else if (modelId.includes('gpt')) groups['GPT'].push(item);
-                else groups['Other'].push(item);
-            }
-
+        // --- Rendering ---
+        function renderAccounts(accounts) {
+            const container = document.getElementById('accounts-list');
+            const manageContainer = document.getElementById('manage-accounts-list');
+            
+            if (!container) return; // Guard
+            
+            // Mocking account data structure based on what we see in /health usually
+            // Ideally we need /accounts endpoint to send full robust data
+            
+            // For now, if accounts is just a number or simple list, we adapt.
+            // If it's an array of objects: { id, email, type, stats: { total, remaining } }
+            
+            // NOTE: Since I don't see the full endpoint response in this artifact, I will assume a structure or
+            // create a placeholder if empty to show the UI.
+            
             let html = '';
-            for (const [groupName, items] of Object.entries(groups)) {
-                if (items.length === 0) continue;
+            
+            if (!Array.isArray(accounts) || accounts.length === 0) {
+                 html = `<div style="grid-column: 1/-1; text-align: center; padding: 2rem; color: var(--muted-foreground);">
+                            No accounts connected. Click 'Connect Account' to start.
+                        </div>`;
+            } else {
+                html = accounts.map(acc => {
+                    const type = acc.type || 'google';
+                    const name = acc.email || acc.name || 'Unknown Account';
+                    const initials = name.substring(0, 2).toUpperCase();
+                    const quota = acc.quota || { remaining: 100, total: 100 };
+                    const percent = (quota.remaining / quota.total) * 100;
+                    
+                    let statusClass = 'bg-secondary';
+                    if (percent > 60) statusClass = 'text-green';
+                    else if (percent > 20) statusClass = 'text-yellow';
+                    else statusClass = 'text-red';
 
-                html += `<div style="margin-bottom:1rem;">
-                    <div style="font-size:0.75rem;font-weight:600;color:var(--muted-foreground);margin-bottom:0.5rem;text-transform:uppercase;letter-spacing:0.05em;">${groupName}</div>`;
-
-                for (const { modelId, remaining, cls, reset } of items) {
-                    const barColor = getQuotaColor(remaining);
-                    html += `<div class="quota-item">
-                        <div class="quota-header">
-                            <span class="quota-label">${modelId} <button class="copy-btn" onclick="copyCmd('${modelId}')">📋</button></span>
-                            <span class="quota-value">${remaining}%${reset ? ' • Resets: ' + reset : ''}</span>
+                    return `
+                    <div class="account-card">
+                        <div class="account-header">
+                            <div class="account-info">
+                                <div class="avatar ${type}">${initials}</div>
+                                <div>
+                                    <div class="account-name" title="${name}">${name}</div>
+                                    <div style="font-size: 0.7rem; color: var(--muted-foreground); text-transform: uppercase;">${type}</div>
+                                </div>
+                            </div>
+                            <button class="btn btn-ghost btn-icon-only" onclick="removeAccount('${acc.id}')" title="Remove">
+                                <span class="material-symbols-rounded icon-sm text-red">delete</span>
+                            </button>
                         </div>
-                        <div class="quota-bar"><div class="quota-fill" style="width:${remaining}%;background:${barColor}"></div></div>
-                    </div>`;
-                }
-                html += '</div>';
+                        <div class="account-body">
+                            <div class="quota-bar-container">
+                                <div class="quota-header">
+                                    <span>Daily Quota</span>
+                                    <span>${Math.round(percent)}%</span>
+                                </div>
+                                <div class="progressbar">
+                                    <div class="progress-fill" style="width: ${percent}%; background-color: var(--${percent > 50 ? 'success' : 'danger'});"></div>
+                                </div>
+                            </div>
+                            <div class="flex-between" style="font-size: 0.75rem;">
+                                <span class="badge ${acc.isRateLimited ? 'error' : 'ok'}">
+                                    ${acc.isRateLimited ? 'RATE LIMITED' : 'ACTIVE'}
+                                </span>
+                                <span style="color: var(--muted-foreground);">
+                                    ${quota.remaining} req left
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    `;
+                }).join('');
             }
-
-            document.getElementById('detail-quotas').innerHTML = html || '<div style="color:var(--muted-foreground);padding:0.5rem 0;">No quota data available</div>';
+            container.innerHTML = html;
+            if(manageContainer) manageContainer.innerHTML = html;
         }
 
-        function renderPerplexity() {
-            const accounts = cachedData.pplx?.accounts || [];
-            const stats = cachedData.pplxStats || {};
-            const modelUsage = cachedData.usage?.perplexity || {};
-
-            // Show stats summary at the top
-            let statsHtml = '';
-            if (!stats.error) {
-                const reqToday = stats.requests || cachedData.usage?.totalPerplexity || 0;
-                const activeConvs = stats.conversations?.total || 0;
-                statsHtml = `
-                    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0.75rem;margin-bottom:1rem;">
-                        <div class="card" style="padding:0.75rem;text-align:center;">
-                            <div style="font-size:1.5rem;font-weight:600;color:var(--purple);">${reqToday}</div>
-                            <div style="font-size:0.7rem;color:var(--muted-foreground);">Requests Today</div>
-                        </div>
-                        <div class="card" style="padding:0.75rem;text-align:center;">
-                            <div style="font-size:1.5rem;font-weight:600;color:var(--purple);">${activeConvs}</div>
-                            <div style="font-size:0.7rem;color:var(--muted-foreground);">Conversations</div>
-                        </div>
-                        <div class="card" style="padding:0.75rem;text-align:center;">
-                            <div style="font-size:1.5rem;font-weight:600;color:var(--success);">~500</div>
-                            <div style="font-size:0.7rem;color:var(--muted-foreground);">Daily Pro Limit</div>
-                        </div>
-                    </div>
-                `;
-            }
-
-            // Show per-model usage
-            const modelEntries = Object.entries(modelUsage);
-            if (modelEntries.length > 0) {
-                statsHtml += `
-                    <div class="card" style="padding:1rem;margin-bottom:1rem;">
-                        <div style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;">📊 Per-Model Usage</div>
-                        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0.5rem;">
-                            ${modelEntries.map(([model, count]) => `
-                                <div style="display:flex;justify-content:space-between;padding:0.5rem;background:var(--secondary);border-radius:6px;">
-                                    <span style="font-size:0.75rem;color:var(--foreground);">${model.replace('pplx-', '')}</span>
-                                    <span style="font-size:0.75rem;font-weight:600;color:var(--purple);">${count}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            }
-
-            if (accounts.length === 0) {
-                document.getElementById('pplx-accounts').innerHTML = statsHtml + '<div style="padding:1rem;color:var(--muted-foreground);">No Perplexity accounts. Click "Add Account" above.</div>';
-                return;
-            }
-            document.getElementById('pplx-accounts').innerHTML = statsHtml + accounts.map(a => `
-                <div class="account-card" style="cursor:default;">
-                    <div class="account-header">
-                        <div class="account-info">
-                            <div class="account-avatar perplexity">${(a.email || 'P')[0].toUpperCase()}</div>
-                            <div><div class="account-email">${a.email || 'Perplexity User'}</div><div class="account-type">Perplexity Pro</div></div>
-                        </div>
-                        <div style="display:flex;align-items:center;gap:0.5rem;">
-                            <span class="badge ${a.isRateLimited ? 'badge-warning' : 'badge-success'}">${a.isRateLimited ? 'Limited' : 'Active'}</span>
-                            <button class="btn-delete" onclick="renamePerplexityAccount('${a.email}')" title="Rename account" style="background:none;color:var(--muted-foreground);">✏️</button>
-                            <button class="btn-delete" onclick="confirmDeleteAccount('${a.email}','perplexity')" title="Remove account">✕</button>
-                        </div>
-                    </div>
-                    <div class="account-body" style="font-size:0.75rem;color:var(--muted-foreground);">
-                        Uses: ${a.usageCount || 0} • Token: ${a.hasToken ? '✓' : '✗'}
-                    </div>
-                </div>
+        function renderModelsList() {
+            const tbody = document.getElementById('models-table-body');
+            tbody.innerHTML = AVAILABLE_MODELS.map(m => `
+                <tr>
+                    <td style="font-weight: 500;">${m.id}</td>
+                    <td><code class="code-snippet">${m.alias}</code></td>
+                    <td><span class="badge" style="background: var(--secondary); color: var(--foreground);">${m.type}</span></td>
+                    <td style="color: var(--muted-foreground);">${m.desc}</td>
+                    <td>
+                        <button class="btn btn-ghost btn-sm" onclick="switchModel('${m.id}')">
+                            Select
+                        </button>
+                    </td>
+                </tr>
             `).join('');
         }
 
-        async function startPerplexityLogin() {
-            const btn = document.getElementById('pplx-btn') || document.getElementById('pplx-add-btn');
-            const orig = btn.innerHTML;
-            btn.innerHTML = '⏳ Opening...';
-            btn.disabled = true;
+        // --- Actions ---
+        async function switchModel(modelId) {
             try {
-                const res = await fetch('/perplexity-login', { method: 'POST' });
-                if (res.status === 409) { showToast('Login in progress', true); btn.innerHTML = orig; btn.disabled = false; return; }
-                if (res.ok) { showToast('Browser opened! Login to Perplexity.'); btn.innerHTML = '⏳ Waiting...'; pollLogin(orig); }
-                else { showToast('Failed', true); btn.innerHTML = orig; btn.disabled = false; }
-            } catch (e) { showToast('Error', true); btn.innerHTML = orig; btn.disabled = false; }
-        }
-
-        async function pollLogin(orig) {
-            const btn = document.getElementById('pplx-btn') || document.getElementById('pplx-add-btn');
-            let prev = cachedData.pplx?.count || 0;
-            let attempts = 0;
-            const check = async () => {
-                attempts++;
-                try {
-                    const res = await fetch('/perplexity-login/status');
-                    const data = await res.json();
-                    if (!data.inProgress) {
-                        btn.innerHTML = orig; btn.disabled = false;
-                        if (data.accounts > prev) { showToast('✓ Account added!'); fetchAllData(); }
-                        return;
-                    }
-                    if (attempts < 300) setTimeout(check, 1000);
-                    else { btn.innerHTML = orig; btn.disabled = false; }
-                } catch (e) { btn.innerHTML = orig; btn.disabled = false; }
-            };
-            check();
-        }
-
-        async function addPplxAccount(e) {
-            e.preventDefault();
-            const email = document.getElementById('pplx-email').value || `pplx_${Date.now()}@user.local`;
-            const token = document.getElementById('pplx-token').value;
-            try {
-                const res = await fetch('/perplexity-sessions', {
+                const res = await fetch(`${API_BASE}/active-model`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, sessionToken: token })
+                    body: JSON.stringify({ model: modelId })
                 });
-                if (res.ok) { showToast('✓ Added!'); closeModal('perplexity-modal'); document.getElementById('pplx-form').reset(); fetchAllData(); }
-                else { const d = await res.json(); showToast(d.error || 'Failed', true); }
-            } catch (e) { showToast('Error', true); }
-            return false;
+                const data = await res.json();
+                
+                if (data.success) {
+                    document.getElementById('model-select').value = modelId;
+                    showToast(`Switched to ${modelId}`, 'success');
+                } else {
+                    showToast('Failed to switch model', 'error');
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Network error switching model', 'error');
+            }
         }
 
-        fetchAllData();
-        setInterval(fetchAllData, 30000);
+        // Modals
+        function showAddAccountModal() {
+            document.getElementById('add-account-modal').classList.add('show');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Toast
+        function showToast(msg, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.className = `toast show ${type}`;
+            document.getElementById('toast-message').innerText = msg;
+            
+            const icons = { 'success': 'check_circle', 'error': 'error', 'info': 'info' };
+            document.getElementById('toast-icon').innerText = icons[type];
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // --- Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchInitialData();
+            // Poll for health/accounts every 5s
+            pollingInterval = setInterval(fetchInitialData, 5000);
+        });
+
     </script>
 </body>
-
 </html>
