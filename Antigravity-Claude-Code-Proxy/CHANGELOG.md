@@ -5,6 +5,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [4.2.0] - 2026-01-02
+
+### Added
+- **Direct OAuth Re-authentication**: Expired accounts can now be re-authenticated directly from dashboard
+  - "Re-authenticate" button opens Google sign-in popup
+  - No need for Antigravity IDE - direct Google OAuth flow
+  - Account is automatically updated with new refresh token
+- **Persistent Multi-State OAuth Server**: Complete rewrite of callback handling
+  - Uses `pendingFlows` Map to track multiple concurrent OAuth flows
+  - Single persistent callback server that never closes between flows
+  - Each flow has unique state and individual timeout
+  - Enables **unlimited back-to-back account additions**
+- **Auto-Refresh Dashboard**: Polls every 2 seconds after OAuth
+  - Detects when new account is added
+  - Shows ✅ toast notification immediately
+  - No manual refresh needed
+- **Enhanced OAuth Logging**: Better visibility into OAuth flow
+  - `[OAuth] Registered flow xxx... (N pending)`
+  - `[OAuth] Callback received: state=xxx..., hasCode=true`
+  - `[OAuth] Flow xxx... completed successfully`
+
+### Changed
+- `oauth.js`: Redesigned from per-flow server to persistent multi-state server
+- `server.js`: Uses `oauthFlows` Map instead of single `activeOAuthFlow` variable
+- Dashboard OAuth functions simplified - no more blocking checks
+- Session expired messages now say "Session Already Processed" for stale callbacks
+
+### Fixed
+- "OAuth flow already in progress" blocking back-to-back logins
+- "State mismatch / CSRF attack" errors on consecutive OAuth attempts
+- Callback server being closed when starting new OAuth flow
+- Accounts not appearing immediately after successful authentication
+
 ## [4.1.0] - 2026-01-01
 
 ### Added

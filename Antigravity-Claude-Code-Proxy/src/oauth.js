@@ -64,106 +64,161 @@ export function getAuthorizationUrl() {
  * @param {number} timeoutMs - Timeout in milliseconds (default 120000)
  * @returns {Promise<string>} Authorization code from OAuth callback
  */
-export function startCallbackServer(expectedState, timeoutMs = 120000) {
-    return new Promise((resolve, reject) => {
-        const server = http.createServer((req, res) => {
-            const url = new URL(req.url, `http://localhost:${OAUTH_CONFIG.callbackPort}`);
 
-            if (url.pathname !== '/oauth-callback') {
-                res.writeHead(404);
-                res.end('Not found');
-                return;
-            }
+// ============ PERSISTENT CALLBACK SERVER FOR MULTI-STATE OAUTH ============
+// This design allows multiple OAuth flows to run concurrently
 
-            const code = url.searchParams.get('code');
-            const state = url.searchParams.get('state');
-            const error = url.searchParams.get('error');
+let persistentServer = null;
+const pendingFlows = new Map(); // state -> { verifier, resolve, reject, timeout }
 
-            if (error) {
-                res.writeHead(400, { 'Content-Type': 'text/html' });
-                res.end(`
-                    <html>
-                    <head><title>Authentication Failed</title></head>
-                    <body style="font-family: system-ui; padding: 40px; text-align: center;">
-                        <h1 style="color: #dc3545;">❌ Authentication Failed</h1>
-                        <p>Error: ${error}</p>
-                        <p>You can close this window.</p>
-                    </body>
-                    </html>
-                `);
-                server.close();
-                reject(new Error(`OAuth error: ${error}`));
-                return;
-            }
+// Force close the callback server and clear all flows
+export function closeCallbackServer() {
+    console.log('[OAuth] Closing callback server and clearing all flows');
+    // Clear all pending flow timeouts
+    for (const [state, flow] of pendingFlows) {
+        if (flow.timeout) clearTimeout(flow.timeout);
+    }
+    pendingFlows.clear();
 
-            if (state !== expectedState) {
-                res.writeHead(400, { 'Content-Type': 'text/html' });
-                res.end(`
-                    <html>
-                    <head><title>Authentication Failed</title></head>
-                    <body style="font-family: system-ui; padding: 40px; text-align: center;">
-                        <h1 style="color: #dc3545;">❌ Authentication Failed</h1>
-                        <p>State mismatch - possible CSRF attack.</p>
-                        <p>You can close this window.</p>
-                    </body>
-                    </html>
-                `);
-                server.close();
-                reject(new Error('State mismatch'));
-                return;
-            }
+    if (persistentServer) {
+        try {
+            persistentServer.close();
+        } catch (e) {
+            // Ignore close errors
+        }
+        persistentServer = null;
+    }
+}
 
-            if (!code) {
-                res.writeHead(400, { 'Content-Type': 'text/html' });
-                res.end(`
-                    <html>
-                    <head><title>Authentication Failed</title></head>
-                    <body style="font-family: system-ui; padding: 40px; text-align: center;">
-                        <h1 style="color: #dc3545;">❌ Authentication Failed</h1>
-                        <p>No authorization code received.</p>
-                        <p>You can close this window.</p>
-                    </body>
-                    </html>
-                `);
-                server.close();
-                reject(new Error('No authorization code'));
-                return;
-            }
+// Ensure the persistent callback server is running
+function ensurePersistentServer() {
+    if (persistentServer) return;
 
-            // Success!
+    persistentServer = http.createServer((req, res) => {
+        const url = new URL(req.url, `http://localhost:${OAUTH_CONFIG.callbackPort}`);
+
+        if (url.pathname !== '/oauth-callback') {
+            res.writeHead(404);
+            res.end('Not found');
+            return;
+        }
+
+        const code = url.searchParams.get('code');
+        const state = url.searchParams.get('state');
+        const error = url.searchParams.get('error');
+
+        console.log(`[OAuth] Callback received: state=${state?.slice(0, 8)}..., hasCode=${!!code}, error=${error || 'none'}`);
+
+        // Look up the pending flow by state
+        const flow = pendingFlows.get(state);
+
+        if (!flow) {
+            // Unknown or already-processed state
+            console.log(`[OAuth] No pending flow for state ${state?.slice(0, 8)}... (may be stale)`);
             res.writeHead(200, { 'Content-Type': 'text/html' });
             res.end(`
                 <html>
-                <head><title>Authentication Successful</title></head>
-                <body style="font-family: system-ui; padding: 40px; text-align: center;">
-                    <h1 style="color: #28a745;">✅ Authentication Successful!</h1>
-                    <p>You can close this window and return to the terminal.</p>
+                <head><title>Session Handled</title></head>
+                <body style="font-family: system-ui; padding: 40px; text-align: center; background: #1a1a2e; color: #fff;">
+                    <h1 style="color: #ffc107;">⚠️ Session Already Processed</h1>
+                    <p>This login session was already completed or timed out.</p>
+                    <p style="color: #888;">You can close this window.</p>
                     <script>setTimeout(() => window.close(), 2000);</script>
                 </body>
                 </html>
             `);
+            return;
+        }
 
-            server.close();
-            resolve(code);
-        });
+        // Clear the timeout for this flow
+        if (flow.timeout) clearTimeout(flow.timeout);
+        pendingFlows.delete(state);
 
-        server.on('error', (err) => {
-            if (err.code === 'EADDRINUSE') {
-                reject(new Error(`Port ${OAUTH_CONFIG.callbackPort} is already in use. Close any other OAuth flows and try again.`));
-            } else {
-                reject(err);
-            }
-        });
+        if (error) {
+            res.writeHead(400, { 'Content-Type': 'text/html' });
+            res.end(`
+                <html>
+                <head><title>Authentication Failed</title></head>
+                <body style="font-family: system-ui; padding: 40px; text-align: center; background: #1a1a2e; color: #fff;">
+                    <h1 style="color: #dc3545;">❌ Authentication Failed</h1>
+                    <p>Error: ${error}</p>
+                    <p style="color: #888;">You can close this window and try again.</p>
+                    <script>setTimeout(() => window.close(), 3000);</script>
+                </body>
+                </html>
+            `);
+            flow.reject(new Error(`OAuth error: ${error}`));
+            return;
+        }
 
-        server.listen(OAUTH_CONFIG.callbackPort, () => {
-            console.log(`[OAuth] Callback server listening on port ${OAUTH_CONFIG.callbackPort}`);
-        });
+        if (!code) {
+            res.writeHead(400, { 'Content-Type': 'text/html' });
+            res.end(`
+                <html>
+                <head><title>Authentication Failed</title></head>
+                <body style="font-family: system-ui; padding: 40px; text-align: center; background: #1a1a2e; color: #fff;">
+                    <h1 style="color: #dc3545;">❌ Authentication Failed</h1>
+                    <p>No authorization code received.</p>
+                    <p style="color: #888;">You can close this window and try again.</p>
+                    <script>setTimeout(() => window.close(), 3000);</script>
+                </body>
+                </html>
+            `);
+            flow.reject(new Error('No authorization code'));
+            return;
+        }
 
-        // Timeout after specified duration
-        setTimeout(() => {
-            server.close();
-            reject(new Error('OAuth callback timeout - no response received'));
+        // Success!
+        console.log(`[OAuth] Flow ${state.slice(0, 8)}... completed successfully`);
+        res.writeHead(200, { 'Content-Type': 'text/html' });
+        res.end(`
+            <html>
+            <head><title>Authentication Successful</title></head>
+            <body style="font-family: system-ui; padding: 40px; text-align: center; background: #1a1a2e; color: #fff;">
+                <h1 style="color: #28a745;">✅ Authentication Successful!</h1>
+                <p>Account added successfully.</p>
+                <p style="color: #888;">This window will close automatically...</p>
+                <script>setTimeout(() => window.close(), 2000);</script>
+            </body>
+            </html>
+        `);
+
+        flow.resolve(code);
+    });
+
+    persistentServer.on('error', (err) => {
+        if (err.code === 'EADDRINUSE') {
+            console.log('[OAuth] Port 51121 in use, will retry...');
+            persistentServer = null;
+        } else {
+            console.error('[OAuth] Server error:', err.message);
+        }
+    });
+
+    persistentServer.listen(OAUTH_CONFIG.callbackPort, () => {
+        console.log(`[OAuth] Persistent callback server started on port ${OAUTH_CONFIG.callbackPort}`);
+    });
+}
+
+export function startCallbackServer(expectedState, timeoutMs = 120000) {
+    // Ensure persistent server is running (doesn't close existing one)
+    ensurePersistentServer();
+
+    return new Promise((resolve, reject) => {
+        // Register this flow
+        const flowTimeout = setTimeout(() => {
+            console.log(`[OAuth] Flow ${expectedState.slice(0, 8)}... timed out after ${timeoutMs / 1000}s`);
+            pendingFlows.delete(expectedState);
+            reject(new Error('OAuth callback timeout'));
         }, timeoutMs);
+
+        pendingFlows.set(expectedState, {
+            resolve,
+            reject,
+            timeout: flowTimeout
+        });
+
+        console.log(`[OAuth] Registered flow ${expectedState.slice(0, 8)}... (${pendingFlows.size} pending)`);
     });
 }
 
@@ -338,6 +393,7 @@ export async function completeOAuthFlow(code, verifier) {
 export default {
     getAuthorizationUrl,
     startCallbackServer,
+    closeCallbackServer,
     exchangeCode,
     refreshAccessToken,
     getUserEmail,

@@ -561,6 +561,50 @@ export class AccountManager {
     }
 
     /**
+     * Add a new account or update existing one
+     * @param {Object} accountData - Account data with email, refreshToken, etc.
+     * @returns {Promise<boolean>} True if added/updated successfully
+     */
+    async addAccount(accountData) {
+        if (!accountData.email) {
+            throw new Error('Account email is required');
+        }
+
+        // Check if account already exists (update case)
+        const existingIndex = this.#accounts.findIndex(a => a.email === accountData.email);
+
+        const account = {
+            email: accountData.email,
+            source: accountData.source || 'oauth',
+            refreshToken: accountData.refreshToken,
+            projectId: accountData.projectId || null,
+            addedAt: accountData.addedAt || new Date().toISOString(),
+            isRateLimited: false,
+            rateLimitResetTime: null,
+            isInvalid: false,
+            invalidReason: null,
+            lastUsed: null
+        };
+
+        if (existingIndex >= 0) {
+            // Update existing account
+            this.#accounts[existingIndex] = { ...this.#accounts[existingIndex], ...account };
+            console.log(`[AccountManager] Updated account: ${account.email}`);
+        } else {
+            // Add new account
+            this.#accounts.push(account);
+            console.log(`[AccountManager] Added account: ${account.email}`);
+        }
+
+        // Clear any cached data for this account
+        this.#tokenCache.delete(accountData.email);
+        this.#projectCache.delete(accountData.email);
+
+        await this.saveToDisk();
+        return true;
+    }
+
+    /**
      * Remove an account by email
      * @param {string} email - Email of the account to remove
      * @returns {Promise<boolean>} True if removed, false if not found

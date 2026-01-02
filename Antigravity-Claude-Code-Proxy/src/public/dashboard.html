@@ -1058,8 +1058,37 @@
                         <div class="stat-indicator success">Available</div>
                     </div>
                 </div>
+
+                <!-- How Model Switching Works -->
+                <div class="card" style="background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary)); border-color: var(--accent-light);">
+                    <div class="card-header">
+                        <div>
+                            <div class="card-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                                <span class="material-symbols-rounded" style="color: var(--accent);">info</span>
+                                How Model Switching Works
+                            </div>
+                        </div>
+                    </div>
+                    <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
+                        <p style="margin-bottom: 0.75rem;"><strong style="color: var(--text-primary);">Claude Code UI has fixed model names:</strong></p>
+                        <ul style="margin-left: 1.25rem; margin-bottom: 1rem;">
+                            <li><strong>Default</strong> → Sonnet (your Custom model selection)</li>
+                            <li><strong>Opus</strong> → Claude Opus 4.5 Thinking</li>
+                            <li><strong>Haiku</strong> → Gemini 3 Flash (fast agentic)</li>
+                            <li><strong>Custom model</strong> → Whatever you select here or in the status bar</li>
+                        </ul>
+                        <p style="margin-bottom: 0.5rem;"><strong style="color: var(--text-primary);">Key points:</strong></p>
+                        <ul style="margin-left: 1.25rem;">
+                            <li>Use the <strong>model switcher</strong> (above) or <strong>status bar</strong> to change the Custom model</li>
+                            <li>Model changes take effect <strong>immediately</strong> in the same conversation</li>
+                            <li>The Claude Code UI name may not update, but the proxy routes to your selected model</li>
+                            <li>You can also use <code style="background: var(--bg-hover); padding: 0.1rem 0.4rem; border-radius: 4px;">/model flash</code> in Claude Code to switch</li>
+                        </ul>
+                    </div>
+                </div>
+
                 <div style="display: flex; gap: 0.5rem; margin-bottom: 1.5rem;">
-                    <button class="btn btn-primary" onclick="openGoogleModal()">+ Google AI Account</button>
+                    <button class="btn btn-primary" onclick="addGoogleAccountDirect()">+ Google AI Account</button>
                     <button class="btn btn-secondary" id="pplx-btn" onclick="startPerplexityLogin()">+ Perplexity
                         Account</button>
                 </div>
@@ -1543,14 +1572,28 @@ Note: Even with stale label, clicking "Custom model" WILL use the dashboard-sele
             const initial = email[0].toUpperCase();
             const type = acc.type === 'perplexity' ? 'Perplexity Pro' : 'Google AI';
             const avatarClass = acc.type === 'perplexity' ? 'perplexity' : 'google';
-            const status = acc.isRateLimited ? 'Limited' : acc.status === 'error' ? 'Error' : 'Active';
-            const badgeClass = status === 'Active' ? 'badge-success' : status === 'Limited' ? 'badge-warning' : 'badge-danger';
+
+            // Determine status - check for invalid/error states
+            let status = 'Active';
+            let badgeClass = 'badge-success';
+            let statusTip = '';
+
+            if (acc.isRateLimited) {
+                status = 'Limited';
+                badgeClass = 'badge-warning';
+            } else if (acc.status === 'invalid' || acc.status === 'error') {
+                // Token expired or fetch failed
+                status = 'Expired';
+                badgeClass = 'badge-danger';
+                statusTip = `<div style="font-size:0.75rem;color:var(--danger);margin-top:4px;">⚠️ Token expired - remove \u0026 re-add account</div>`;
+            }
+
             const onclick = selectable ? `onclick="selectAccount('${email}')"` : '';
             const selected = selectedAccount === email ? 'selected' : '';
             const accountType = acc.type === 'perplexity' ? 'perplexity' : 'google';
 
-            // Reset countdown tip for Google accounts
-            const resetTip = acc.resetCountdown
+            // Reset countdown tip for Google accounts (only if not expired)
+            const resetTip = (acc.resetCountdown && status !== 'Expired')
                 ? `<div style="font-size:0.8rem;color:var(--warning);margin-top:4px;font-weight:600;">${acc.resetCountdown} Claude reset</div>`
                 : '';
 
@@ -1562,10 +1605,11 @@ Note: Even with stale label, clicking "Custom model" WILL use the dashboard-sele
                             <div class="account-email">${email.split('@')[0]}</div>
                             <div class="account-type">${type}</div>
                             ${resetTip}
+                            ${statusTip}
                         </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:0.5rem;">
-                        <span class="badge ${badgeClass}">${status}</span>
+                        <span class="badge ${badgeClass}" title="${status === 'Expired' ? 'Token expired - open Antigravity IDE and re-login' : ''}">${status}</span>
                         ${acc.type === 'perplexity' ? `<button class="btn-delete material-symbols-rounded" onclick="event.stopPropagation();renamePerplexityAccount('${email}')" title="Rename account" style="background:none;color:var(--text-muted);font-size:16px;">edit</button>` : ''}
                         <button class="btn-delete material-symbols-rounded" onclick="event.stopPropagation();confirmDeleteAccount('${email}','${accountType}')" title="Remove account" style="font-size:16px;">close</button>
                     </div>
@@ -1653,6 +1697,30 @@ Note: Even with stale label, clicking "Custom model" WILL use the dashboard-sele
             document.getElementById('usage-detail').style.display = 'block';
             document.getElementById('detail-avatar').textContent = email[0].toUpperCase();
             document.getElementById('detail-email').textContent = email;
+
+            // Check if account is expired/invalid
+            const isExpired = googleAcc.status === 'invalid' || googleAcc.status === 'error';
+
+            if (isExpired) {
+                document.getElementById('detail-type').innerHTML = '<span style="color:var(--danger);">⚠️ Token Expired</span>';
+                document.getElementById('detail-quotas').innerHTML = `
+                    <div style="padding:1rem;text-align:center;">
+                        <div style="font-size:1.2rem;margin-bottom:0.5rem;">🔄 Re-authentication Required</div>
+                        <div style="color:var(--text-muted);margin-bottom:1rem;">
+                            The OAuth token for this account has expired or is invalid.<br>
+                            Click below to re-authenticate and restore access.
+                        </div>
+                        <button class="btn btn-primary" onclick="reauthAccount('${email}')" style="margin-right:0.5rem;">
+                            🔐 Re-authenticate
+                        </button>
+                        <button class="btn btn-secondary" onclick="confirmDeleteAccount('${email}','google')">
+                            ✕ Remove Account
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+
             document.getElementById('detail-type').textContent = 'Google AI Pro';
 
             const limits = googleAcc.limits || {};
@@ -1697,8 +1765,75 @@ Note: Even with stale label, clicking "Custom model" WILL use the dashboard-sele
                 }
                 html += '</div>';
             }
-
             document.getElementById('detail-quotas').innerHTML = html || '<div style="color:var(--text-muted);padding:0.5rem 0;">No quota data available</div>';
+        }
+
+        // Re-authenticate an expired account - uses direct OAuth flow
+        async function reauthAccount(email) {
+            showToast('🔄 Opening Google sign-in...');
+
+            // Open OAuth flow in new window (server supports multiple concurrent flows)
+            const popup = window.open(`/oauth/start`, '_blank', 'width=600,height=700,left=200,top=100');
+
+            if (!popup) {
+                showToast('⚠️ Popup blocked! Please allow popups for this site.', true);
+                return;
+            }
+
+            // Track initial account count to detect new account
+            const initialCount = cachedData.limits?.totalAccounts || 0;
+
+            // Poll for new account being added
+            let attempts = 0;
+            const pollInterval = setInterval(async () => {
+                attempts++;
+                try {
+                    await fetchAllData();
+                    const newCount = cachedData.limits?.totalAccounts || 0;
+                    if (newCount > initialCount) {
+                        clearInterval(pollInterval);
+                        showToast('✅ Account added successfully!');
+                    }
+                } catch (e) { /* ignore */ }
+
+                if (attempts >= 30) { // 60 seconds max
+                    clearInterval(pollInterval);
+                }
+            }, 2000);
+        }
+
+        // Add new Google account using direct OAuth flow
+        async function addGoogleAccountDirect() {
+            showToast('🔄 Opening Google sign-in...');
+
+            // Open OAuth flow in new window (server supports multiple concurrent flows)
+            const popup = window.open(`/oauth/start`, '_blank', 'width=600,height=700,left=200,top=100');
+
+            if (!popup) {
+                showToast('⚠️ Popup blocked! Please allow popups for this site.', true);
+                return;
+            }
+
+            // Track initial account count to detect new account
+            const initialCount = cachedData.limits?.totalAccounts || 0;
+
+            // Poll for new account being added
+            let attempts = 0;
+            const pollInterval = setInterval(async () => {
+                attempts++;
+                try {
+                    await fetchAllData();
+                    const newCount = cachedData.limits?.totalAccounts || 0;
+                    if (newCount > initialCount) {
+                        clearInterval(pollInterval);
+                        showToast('✅ Account added successfully!');
+                    }
+                } catch (e) { /* ignore */ }
+
+                if (attempts >= 30) { // 60 seconds max
+                    clearInterval(pollInterval);
+                }
+            }, 2000);
         }
 
         function renderPerplexity() {

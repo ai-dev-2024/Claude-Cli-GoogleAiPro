@@ -399,6 +399,97 @@ app.delete('/google-accounts/:email', async (req, res) => {
     }
 });
 
+// ================= OAUTH WEB ENDPOINTS =================
+// Import OAuth functions for web-based authentication
+import { getAuthorizationUrl, startCallbackServer, completeOAuthFlow, closeCallbackServer } from './oauth.js';
+
+// Track multiple OAuth flows by state (enables back-to-back logins)
+const oauthFlows = new Map();
+const OAUTH_FLOW_TIMEOUT_MS = 180000; // 3 minutes - auto-cleanup stale flows
+
+// Helper to cleanup stale OAuth flows
+function cleanupStaleOAuthFlows() {
+    const now = Date.now();
+    for (const [state, flow] of oauthFlows) {
+        if (now - flow.startedAt > OAUTH_FLOW_TIMEOUT_MS) {
+            console.log(`[OAuth] Cleaning up stale flow ${state.slice(0, 8)}...`);
+            oauthFlows.delete(state);
+        }
+    }
+}
+
+// Start OAuth flow - redirects to Google OAuth
+app.get('/oauth/start', async (req, res) => {
+    try {
+        // Cleanup stale flows first
+        cleanupStaleOAuthFlows();
+
+        const { url, verifier, state } = getAuthorizationUrl();
+
+        // Store this flow (allows multiple concurrent flows)
+        oauthFlows.set(state, { verifier, startedAt: Date.now() });
+        console.log(`[OAuth] Started flow ${state.slice(0, 8)}... (${oauthFlows.size} active)`);
+
+        // Start callback server in background (will handle any registered state)
+        startCallbackServer(state, 120000).then(async (code) => {
+            // Find the flow by state
+            const flow = oauthFlows.get(state);
+            if (!flow) {
+                console.log(`[OAuth] Flow ${state.slice(0, 8)}... already completed or cancelled`);
+                return;
+            }
+
+            try {
+                const accountInfo = await completeOAuthFlow(code, flow.verifier);
+                console.log(`[OAuth] Successfully authenticated: ${accountInfo.email}`);
+
+                // Add account to manager
+                await accountManager.addAccount({
+                    email: accountInfo.email,
+                    refreshToken: accountInfo.refreshToken,
+                    projectId: accountInfo.projectId,
+                    source: 'oauth',
+                    addedAt: new Date().toISOString()
+                });
+
+                console.log(`[OAuth] Account ${accountInfo.email} added successfully`);
+            } catch (err) {
+                console.error('[OAuth] Failed to complete flow:', err.message);
+            } finally {
+                oauthFlows.delete(state);
+            }
+        }).catch(err => {
+            console.error('[OAuth] Callback error:', err.message);
+            oauthFlows.delete(state);
+        });
+
+        // Redirect user to Google OAuth
+        res.redirect(url);
+
+    } catch (error) {
+        console.error('[OAuth] Start error:', error.message);
+        res.status(500).json({ error: error.message });
+    }
+});
+
+// Check OAuth status (also auto-cleans stale flows)
+app.get('/oauth/status', (req, res) => {
+    cleanupStaleOAuthFlows();
+    res.json({
+        inProgress: oauthFlows.size > 0,
+        activeFlows: oauthFlows.size,
+        startedAt: oauthFlows.size > 0 ? [...oauthFlows.values()][0]?.startedAt : null
+    });
+});
+
+// Cancel all OAuth flows
+app.delete('/oauth/cancel', (req, res) => {
+    const count = oauthFlows.size;
+    oauthFlows.clear();
+    closeCallbackServer();
+    res.json({ success: true, message: `Cancelled ${count} OAuth flow(s)` });
+});
+
 // Browser-based login for Perplexity - opens dedicated browser with stealth mode
 app.post('/perplexity-login', async (req, res) => {
     try {
@@ -992,17 +1083,35 @@ app.post('/v1/messages', async (req, res) => {
         const isUsingCustomModel = settingsCustomModel && resolvedModel === settingsCustomModel;
 
         if (!headerOverrideModel) {
-            // Only apply smart routing if no header override
-            if (isUsingCustomModel && globalModelOverride && globalModelOverride !== resolvedModel) {
-                // Extension clicked "Custom model" but dashboard has a different value
-                // Use the dashboard value instead
-                console.log(`[API] Custom model selected: ${resolvedModel} → Using dashboard: ${globalModelOverride}`);
+            // ================= LAST-CHANGE-WINS LOGIC =================
+            // Status bar/dashboard sets globalModelOverride and syncs to settings.json
+            // Claude Code reads settings.json for Custom model value
+            // When Claude Code sends a model matching globalModelOverride, it's reflecting our choice
+
+            const currentExtensionModel = resolveModelAlias(model);
+
+            // If incoming model matches our override, Claude Code is reflecting our status bar choice
+            if (globalModelOverride && currentExtensionModel === globalModelOverride) {
+                // Claude Code is using what we set - keep using override
+                console.log(`[API] Using model from status bar: ${globalModelOverride}`);
                 resolvedModel = globalModelOverride;
-            } else if (isUsingCustomModel) {
-                console.log(`[API] Extension using Custom model: ${resolvedModel} (matches dashboard)`);
+            } else if (lastExtensionModel && currentExtensionModel !== lastExtensionModel && currentExtensionModel !== globalModelOverride) {
+                // User switched to a DIFFERENT model via Claude Code UI - clear override
+                console.log(`[API] Claude Code UI changed: ${lastExtensionModel} → ${currentExtensionModel} (clearing override)`);
+                globalModelOverride = null;
+                resolvedModel = currentExtensionModel;
+            } else if (globalModelOverride) {
+                // Status bar override is set, use it
+                console.log(`[API] Using status bar override: ${globalModelOverride}`);
+                resolvedModel = globalModelOverride;
             } else {
-                console.log(`[API] Extension using UI model: ${resolvedModel} (Opus/Haiku/Default - pass-through)`);
+                // No override, use what Claude Code sent
+                console.log(`[API] Using Claude Code model: ${currentExtensionModel}`);
+                resolvedModel = currentExtensionModel;
             }
+
+            // Update tracking for next request
+            lastExtensionModel = currentExtensionModel;
         }
 
         // ================= MODEL INFO INJECTION =================

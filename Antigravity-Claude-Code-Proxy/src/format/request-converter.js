@@ -85,6 +85,35 @@ export function convertAnthropicToGoogle(anthropicRequest) {
         processedMessages = closeToolLoopForThinking(messages);
     }
 
+    // ALWAYS strip thinking blocks from conversation history
+    // Thinking block signatures are model-specific and become corrupted when switching models
+    // The model will generate fresh thinking blocks if thinking is enabled
+    const hasThinkingBlocks = processedMessages.some(msg =>
+        Array.isArray(msg.content) && msg.content.some(block =>
+            block.type === 'thinking' || block.type === 'redacted_thinking' ||
+            block.thinking !== undefined || block.thought === true
+        )
+    );
+
+    if (hasThinkingBlocks) {
+        processedMessages = processedMessages.map(msg => {
+            if (!Array.isArray(msg.content)) return msg;
+            const filtered = msg.content.filter(block => {
+                // Remove all thinking-related blocks
+                if (block.type === 'thinking' || block.type === 'redacted_thinking') return false;
+                if (block.thinking !== undefined) return false;
+                if (block.thought === true) return false;
+                return true;
+            });
+            // Ensure at least one content block remains
+            if (filtered.length === 0) {
+                filtered.push({ type: 'text', text: '' });
+            }
+            return { ...msg, content: filtered };
+        });
+        console.log('[RequestConverter] Stripped thinking blocks from history to prevent signature corruption');
+    }
+
     // Convert messages to contents, then filter unsigned thinking blocks
     for (let i = 0; i < processedMessages.length; i++) {
         const msg = processedMessages[i];
