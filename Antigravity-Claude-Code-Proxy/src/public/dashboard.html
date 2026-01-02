@@ -1060,7 +1060,8 @@
                 </div>
 
                 <!-- How Model Switching Works -->
-                <div class="card" style="background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary)); border-color: var(--accent-light);">
+                <div class="card"
+                    style="background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary)); border-color: var(--accent-light);">
                     <div class="card-header">
                         <div>
                             <div class="card-title" style="display: flex; align-items: center; gap: 0.5rem;">
@@ -1070,19 +1071,28 @@
                         </div>
                     </div>
                     <div style="font-size: 0.85rem; color: var(--text-secondary); line-height: 1.6;">
-                        <p style="margin-bottom: 0.75rem;"><strong style="color: var(--text-primary);">Claude Code UI has fixed model names:</strong></p>
+                        <p style="margin-bottom: 0.75rem;"><strong style="color: var(--text-primary);">Claude Code UI
+                                has fixed model names:</strong></p>
                         <ul style="margin-left: 1.25rem; margin-bottom: 1rem;">
                             <li><strong>Default</strong> → Sonnet (your Custom model selection)</li>
                             <li><strong>Opus</strong> → Claude Opus 4.5 Thinking</li>
                             <li><strong>Haiku</strong> → Gemini 3 Flash (fast agentic)</li>
                             <li><strong>Custom model</strong> → Whatever you select here or in the status bar</li>
                         </ul>
-                        <p style="margin-bottom: 0.5rem;"><strong style="color: var(--text-primary);">Key points:</strong></p>
+                        <p style="margin-bottom: 0.5rem;"><strong style="color: var(--text-primary);">Key
+                                points:</strong></p>
                         <ul style="margin-left: 1.25rem;">
-                            <li>Use the <strong>model switcher</strong> (above) or <strong>status bar</strong> to change the Custom model</li>
+                            <li>Use the <strong>model switcher</strong> (above) or <strong>status bar</strong> to change
+                                the Custom model</li>
                             <li>Model changes take effect <strong>immediately</strong> in the same conversation</li>
-                            <li>The Claude Code UI name may not update, but the proxy routes to your selected model</li>
-                            <li>You can also use <code style="background: var(--bg-hover); padding: 0.1rem 0.4rem; border-radius: 4px;">/model flash</code> in Claude Code to switch</li>
+                            <li
+                                style="background: rgba(245, 158, 11, 0.2); padding: 0.3rem 0.5rem; border-radius: 4px; border-left: 3px solid var(--warning);">
+                                <strong style="color: var(--warning);">Note:</strong> The Claude Code UI name may not
+                                update, but the proxy routes to your selected model</li>
+                            <li>You can also use <code
+                                    style="background: var(--bg-hover); padding: 0.1rem 0.4rem; border-radius: 4px;">/model flash</code>
+                                in Claude Code <strong style="color: var(--warning);">(CLI only, not extension)</strong>
+                                to switch</li>
                         </ul>
                     </div>
                 </div>
@@ -1663,9 +1673,8 @@ Note: Even with stale label, clicking "Custom model" WILL use the dashboard-sele
             }
             document.getElementById('usage-accounts').innerHTML = accounts.map(a => renderAccountCard({ ...a, type: 'google' }, true)).join('');
 
-            if (!selectedAccount && accounts.length > 0) {
-                selectAccount(accounts[0].email);
-            }
+            // Don't auto-navigate to usage page on initial load
+            // User can click an account to view details
         }
 
         function selectAccount(email) {
