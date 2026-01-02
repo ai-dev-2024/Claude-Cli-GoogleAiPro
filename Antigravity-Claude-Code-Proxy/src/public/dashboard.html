@@ -1197,64 +1197,64 @@
                 </div>
             </div>
         </div>
+
+        <!-- Sessions Page -->
+        <div id="page-sessions" class="page">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Active Sessions</div>
+                    <div class="stat-value" id="sessions-count">-</div>
+                    <div class="stat-indicator success">Windows/Terminals</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Global Model</div>
+                    <div class="stat-value" id="global-model-display" style="font-size: 1rem;">-</div>
+                    <div class="stat-indicator">Fallback for new sessions</div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Session Tracking</div>
+                        <div class="card-description">Each Antigravity window and CLI terminal has its own session with
+                            model persistence</div>
+                    </div>
+                    <button class="btn btn-secondary btn-sm" onclick="loadSessions()">
+                        <span class="material-symbols-rounded" style="font-size: 16px;">refresh</span> Refresh
+                    </button>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="models-table">
+                        <thead>
+                            <tr>
+                                <th>Session ID</th>
+                                <th>Name</th>
+                                <th>Model</th>
+                                <th>Last Used</th>
+                                <th>Created</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sessions-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card" style="background: var(--bg-secondary); border-left: 3px solid var(--success);">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <span class="material-symbols-rounded"
+                        style="color: var(--success); font-size: 1.5rem;">check_circle</span>
+                    <div>
+                        <div style="font-weight: 600; color: var(--text-primary);">Auto-Session Enabled</div>
+                        <div style="font-size: 0.85rem; color: var(--text-muted);">Each Antigravity window and CLI
+                            terminal automatically gets its own session. Models persist per-session.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        </div>
     </main>
-
-    <!-- Sessions Page -->
-    <div id="page-sessions" class="page">
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-label">Active Sessions</div>
-                <div class="stat-value" id="sessions-count">-</div>
-                <div class="stat-indicator success">Windows/Terminals</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-label">Global Model</div>
-                <div class="stat-value" id="global-model-display" style="font-size: 1rem;">-</div>
-                <div class="stat-indicator">Fallback for new sessions</div>
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <div>
-                    <div class="card-title">Session Tracking</div>
-                    <div class="card-description">Each Antigravity window and CLI terminal has its own session with
-                        model persistence</div>
-                </div>
-                <button class="btn btn-secondary btn-sm" onclick="loadSessions()">
-                    <span class="material-symbols-rounded" style="font-size: 16px;">refresh</span> Refresh
-                </button>
-            </div>
-            <div style="overflow-x: auto;">
-                <table class="models-table">
-                    <thead>
-                        <tr>
-                            <th>Session ID</th>
-                            <th>Name</th>
-                            <th>Model</th>
-                            <th>Last Used</th>
-                            <th>Created</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="sessions-tbody"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="card" style="background: var(--bg-secondary); border-left: 3px solid var(--success);">
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <span class="material-symbols-rounded"
-                    style="color: var(--success); font-size: 1.5rem;">check_circle</span>
-                <div>
-                    <div style="font-weight: 600; color: var(--text-primary);">Auto-Session Enabled</div>
-                    <div style="font-size: 0.85rem; color: var(--text-muted);">Each Antigravity window and CLI terminal
-                        automatically gets its own session. Models persist per-session.</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
 
     <!-- Google Modal -->
     <div id="google-modal" class="modal-overlay">
