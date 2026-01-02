@@ -46,6 +46,18 @@ logs/
 *.token
 *.secret
 
+# Secrets files (NEVER commit these)
+.secrets
+**/.secrets
+*.secrets
+claude-proxy-ext-src/.secrets
+AntiGravity-Multiaccount/.secrets
+
+# Session data
+*-sessions.json
+session*.json
+**/session*.json
+
 # Python
 __pycache__/
 *.pyc
