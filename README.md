@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Proxy-v2.5.0-blue?style=for-the-badge" alt="Proxy v2.5.0">
-  <img src="https://img.shields.io/badge/Extension-v2.5.0-purple?style=for-the-badge" alt="Extension v2.5.0">
+  <img src="https://img.shields.io/badge/Proxy-v3.9.2-blue?style=for-the-badge" alt="Proxy v3.9.2">
+  <img src="https://img.shields.io/badge/Extension-v3.9.2-purple?style=for-the-badge" alt="Extension v3.9.2">
   <img src="https://img.shields.io/badge/Claude_Code-Compatible-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Compatible">
   <img src="https://img.shields.io/badge/Antigravity-Powered-00D4AA?style=for-the-badge" alt="Antigravity Powered">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
@@ -64,7 +64,19 @@
 </p>
 
 <p align="center">
-  <img src="docs/images/statusbar.png" alt="Status Bar" width="500">
+  <img src="docs/images/quota-popup.png" alt="Quota Popup" width="600">
+  <br>
+  <em>Click status bar to see Claude & Gemini quotas with reset times</em>
+</p>
+
+<p align="center">
+  <img src="docs/images/model-switcher.png" alt="Model Switcher" width="400">
+  <br>
+  <em>One-click model switching between Flash, Pro, Opus, Sonnet, and more</em>
+</p>
+
+<p align="center">
+  <img src="docs/images/statusbar-icon.png" alt="Status Bar" width="300">
   <br>
   <em>Live model indicator in your IDE status bar (⚡ Flash, 💎 Pro, 🎭 Opus)</em>
 </p>
@@ -184,9 +196,11 @@ Features:
 
 ---
 
-## 📊 Status Bar (v2.0+)
+## 📊 Status Bar Extension (v3.9+)
 
-The status bar extension shows your current model in real-time:
+The status bar extension shows your current model and quota information in real-time:
+
+### Status Bar Icons
 
 | Icon | Model |
 |------|-------|
@@ -197,10 +211,19 @@ The status bar extension shows your current model in real-time:
 | 🌐 | Grok |
 | 🔍 | Perplexity/Sonar |
 
-**Features:**
-- Updates every 2 seconds
-- Click to open dashboard
-- Notification on model change
+### Quota Popup (Click Account Icon)
+
+- **Model Quotas**: Overall Claude & Gemini percentages with visual bars
+- **Per-Account Breakdown**: All connected accounts with individual quotas
+- **Smart Sorting**: Accounts with highest Claude quota shown first
+- **Reset Times**: Know exactly when your quota resets
+
+### Features
+
+- **One-Click Model Switching**: Click model name to switch instantly
+- **Real-Time Updates**: 5-second polling for accurate quota display
+- **Offline Detection**: Shows "Offline" in red when proxy is down
+- **Open Dashboard**: Quick link to full web dashboard
 
 ---
 
