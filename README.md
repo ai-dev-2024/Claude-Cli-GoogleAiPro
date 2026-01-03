@@ -3,8 +3,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ai-dev-2024/Antigravity-Claude-Code-Proxy"><img src="https://img.shields.io/badge/Proxy-v3.9.2-blue?style=for-the-badge" alt="Proxy v3.9.2"></a>
-  <a href="https://open-vsx.org/extension/ai-dev-2024/claude-proxy-status"><img src="https://img.shields.io/badge/Extension-v3.9.2-purple?style=for-the-badge" alt="Extension v3.9.2"></a>
+  <a href="https://github.com/ai-dev-2024/Antigravity-Claude-Code-Proxy"><img src="https://img.shields.io/badge/Proxy-v2.7.0-blue?style=for-the-badge" alt="Proxy v2.7.0"></a>
+  <a href="https://open-vsx.org/extension/ai-dev-2024/claude-proxy-status"><img src="https://img.shields.io/badge/Extension-v4.1.1-purple?style=for-the-badge" alt="Extension v4.1.1"></a>
   <img src="https://img.shields.io/badge/Claude_Code-Compatible-blueviolet?style=for-the-badge&logo=anthropic" alt="Claude Code Compatible">
   <img src="https://img.shields.io/badge/Antigravity-Powered-00D4AA?style=for-the-badge" alt="Antigravity Powered">
   <img src="https://img.shields.io/badge/License-MIT-yellow?style=for-the-badge" alt="MIT License">
@@ -280,6 +280,8 @@ See [SECURITY.md](SECURITY.md) for full security policy.
 
 | Version | Type | Features |
 |---------|------|----------|
+| **v2.7** | Extension v4.1.1 | Per-window model selection, workspace persistence |
+| **v2.6** | Extension | Per-session isolation, sessions dashboard |
 | **v2.5** | Extension | IDE account switcher, simplified layout |
 | **v2.4** | Extension | Direct OAuth, multi-state auth server |
 | **v2.3** | Extension | Per-window models, dark theme dashboard |

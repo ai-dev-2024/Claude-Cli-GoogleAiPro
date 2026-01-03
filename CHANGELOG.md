@@ -15,6 +15,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 # Version 2.x — Extension + Proxy
 
+## [2.7.0] - 2026-01-03
+
+### Extension v4.1.1
+- **Per-Window Model Selection**: Each window maintains its own model independently
+- **Workspace Persistence**: Model choice persists per-workspace across restarts
+- **Disabled Settings Watchers**: Fixed issue where global settings were overriding window-local models
+- **No More Model Ping-Pong**: Multiple windows no longer conflict over model selection
+
+### Proxy Fixes
+- **Correct Entry Point**: PM2 now starts `index.js` instead of `server.js`
+- **Session Persistence**: Models survive proxy restarts
+
+---
+
 ## [2.6.0] - 2026-01-03
 
 ### Added
