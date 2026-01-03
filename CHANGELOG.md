@@ -15,6 +15,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 # Version 2.x — Extension + Proxy
 
+## [2.7.1] - 2026-01-03
+
+### Extension v4.2.2
+- **Proxy Toggle Fix**: Fixed toggle not working in offline state - now properly disables/enables
+- **Correct Server Path**: PM2 fallback uses correct `server.js` entry point
+- **Toggle Action Handling**: Model switcher correctly processes toggle in all states
+
+---
+
 ## [2.7.0] - 2026-01-03
 
 ### Extension v4.1.1
