@@ -1,0 +1,41 @@
+name: Publish Extension
+
+on:
+  push:
+    tags:
+      - 'v*'  # Triggers on version tags like v2.8.0, v2.9.0, etc.
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: claude-proxy-ext-src
+        run: npm install
+
+      - name: Package extension
+        working-directory: claude-proxy-ext-src
+        run: npx @vscode/vsce package
+
+      - name: Publish to Open VSX
+        working-directory: claude-proxy-ext-src
+        env:
+          OVSX_PAT: ${{ secrets.OVSX_PAT }}
+        run: npx ovsx publish *.vsix -p $OVSX_PAT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: claude-proxy-ext-src/*.vsix
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
